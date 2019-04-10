@@ -547,6 +547,12 @@ TEST(TripleTest, ParsedIDs) {
   EXPECT_EQ(Triple::GNU, T.getEnvironment());
   EXPECT_EQ(Triple::MipsSubArch_r6, T.getSubArch());
 
+  T = Triple("mmix-unknown-unknown");
+  EXPECT_EQ(Triple::mmix, T.getArch());
+  EXPECT_EQ(Triple::UnknownVendor, T.getVendor());
+  EXPECT_EQ(Triple::UnknownOS, T.getOS());
+  EXPECT_EQ(Triple::UnknownEnvironment, T.getEnvironment());
+
   T = Triple("arm-oe-linux-gnueabi");
   EXPECT_EQ(Triple::arm, T.getArch());
   EXPECT_EQ(Triple::OpenEmbedded, T.getVendor());
@@ -788,6 +794,11 @@ TEST(TripleTest, BitWidthPredicates) {
   EXPECT_FALSE(T.isArch32Bit());
   EXPECT_TRUE(T.isArch64Bit());
 
+  T.setArch(Triple::mmix);
+  EXPECT_FALSE(T.isArch16Bit());
+  EXPECT_FALSE(T.isArch32Bit());
+  EXPECT_TRUE(T.isArch64Bit());
+
   T.setArch(Triple::msp430);
   EXPECT_TRUE(T.isArch16Bit());
   EXPECT_FALSE(T.isArch32Bit());
@@ -907,6 +918,9 @@ TEST(TripleTest, BitWidthArchVariants) {
   T.setArch(Triple::mipsel);
   EXPECT_EQ(Triple::mipsel, T.get32BitArchVariant().getArch());
   EXPECT_EQ(Triple::mips64el, T.get64BitArchVariant().getArch());
+
+  T.setArch(Triple::mmix);
+  EXPECT_EQ(Triple::mmix, T.get64BitArchVariant().getArch());
 
   T.setArch(Triple::ppc);
   EXPECT_EQ(Triple::ppc, T.get32BitArchVariant().getArch());
@@ -1093,6 +1107,10 @@ TEST(TripleTest, EndianArchVariants) {
   T.setArch(Triple::mipsel);
   EXPECT_EQ(Triple::mips, T.getBigEndianArchVariant().getArch());
   EXPECT_EQ(Triple::mipsel, T.getLittleEndianArchVariant().getArch());
+
+  T.setArch(Triple::mmix);
+  EXPECT_EQ(Triple::mmix, T.getBigEndianArchVariant().getArch());
+  EXPECT_EQ(Triple::UnknownArch, T.getLittleEndianArchVariant().getArch());
 
   T.setArch(Triple::ppc);
   EXPECT_EQ(Triple::ppc, T.getBigEndianArchVariant().getArch());
