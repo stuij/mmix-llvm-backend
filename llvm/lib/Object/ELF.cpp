@@ -44,6 +44,13 @@ StringRef llvm::object::getELFRelocationTypeName(uint32_t Machine,
       break;
     }
     break;
+  case ELF::EM_MMIX:
+    switch (Type) {
+#include "llvm/BinaryFormat/ELFRelocs/MMIX.def"
+    default:
+      break;
+    }
+    break;
   case ELF::EM_AARCH64:
     switch (Type) {
 #include "llvm/BinaryFormat/ELFRelocs/AArch64.def"
