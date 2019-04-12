@@ -1106,6 +1106,8 @@ StringRef ELFObjectFile<ELFT>::getFileFormatName() const {
       return "ELF64-sparc";
     case ELF::EM_MIPS:
       return "ELF64-mips";
+    case ELF::EM_MMIX:
+      return "ELF64-mmix";
     case ELF::EM_AMDGPU:
       return "ELF64-amdgpu";
     case ELF::EM_BPF:
@@ -1148,6 +1150,8 @@ template <class ELFT> Triple::ArchType ELFObjectFile<ELFT>::getArch() const {
     }
   case ELF::EM_MSP430:
     return Triple::msp430;
+  case ELF::EM_MMIX:
+    return Triple::mmix;
   case ELF::EM_PPC:
     return Triple::ppc;
   case ELF::EM_PPC64:

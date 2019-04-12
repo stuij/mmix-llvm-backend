@@ -570,6 +570,16 @@ enum {
   ODK_PAGESIZE = 11   // Page size information
 };
 
+// MMIX-specific e_flags
+enum : unsigned {
+  EF_MMIX_ABI_GNU = 0x00000001 // compatibility with the GNU MMIX implementation
+};
+
+// ELF Relocation types for MMIX
+enum {
+#include "ELFRelocs/MMIX.def"
+};
+
 // Hexagon-specific e_flags
 enum {
   // Object processor version flags, bits[11:0]

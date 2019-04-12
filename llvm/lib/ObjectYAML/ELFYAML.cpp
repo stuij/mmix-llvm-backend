@@ -338,6 +338,9 @@ void ScalarBitSetTraits<ELFYAML::ELF_EF>::bitset(IO &IO,
     BCaseMask(EF_MIPS_ARCH_32R6, EF_MIPS_ARCH);
     BCaseMask(EF_MIPS_ARCH_64R6, EF_MIPS_ARCH);
     break;
+  case ELF::EM_MMIX:
+    BCase(EF_MMIX_ABI_GNU);
+    break;
   case ELF::EM_HEXAGON:
     BCase(EF_HEXAGON_MACH_V2);
     BCase(EF_HEXAGON_MACH_V3);
@@ -623,6 +626,9 @@ void ScalarEnumerationTraits<ELFYAML::ELF_REL>::enumeration(
     break;
   case ELF::EM_MIPS:
 #include "llvm/BinaryFormat/ELFRelocs/Mips.def"
+    break;
+  case ELF::EM_MMIX:
+#include "llvm/BinaryFormat/ELFRelocs/MMIX.def"
     break;
   case ELF::EM_HEXAGON:
 #include "llvm/BinaryFormat/ELFRelocs/Hexagon.def"

@@ -1632,6 +1632,10 @@ static const EnumEntry<unsigned> ElfHeaderMipsFlags[] = {
   ENUM_ENT(EF_MIPS_ARCH_64R6, "mips64r6")
 };
 
+static const EnumEntry<unsigned> ElfHeaderMMIXFlags[] = {
+  ENUM_ENT(EF_MMIX_ABI_GNU, "GNU ABI")
+};
+
 static const EnumEntry<unsigned> ElfHeaderAMDGPUFlags[] = {
   LLVM_READOBJ_ENUM_ENT(ELF, EF_AMDGPU_MACH_NONE),
   LLVM_READOBJ_ENUM_ENT(ELF, EF_AMDGPU_MACH_R600_R600),
@@ -3089,6 +3093,8 @@ template <class ELFT> void GNUStyle<ELFT>::printFileHeaders(const ELFO *Obj) {
         printFlags(e->e_flags, makeArrayRef(ElfHeaderMipsFlags),
                    unsigned(ELF::EF_MIPS_ARCH), unsigned(ELF::EF_MIPS_ABI),
                    unsigned(ELF::EF_MIPS_MACH));
+  else if (e->e_machine == EM_MMIX)
+    ElfFlags = printFlags(e->e_flags, makeArrayRef(ElfHeaderMMIXFlags));
   else if (e->e_machine == EM_RISCV)
     ElfFlags = printFlags(e->e_flags, makeArrayRef(ElfHeaderRISCVFlags));
   Str = "0x" + to_hexString(e->e_flags);
