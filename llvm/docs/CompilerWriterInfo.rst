@@ -52,6 +52,11 @@ MIPS
 
 * `MIPS 64-bit ELF Object File Specification <https://www.linux-mips.org/pub/linux/mips/doc/ABI/elf64-2.4.pdf>`_
 
+MMIX
+----
+
+* `The Art of Computer Programming, Volume 1, Fascicle 1: MMIX -- A RISC Computer for the New Millennium <http://mmix.cs.hm.edu/doc/fasc1.pdf>`_
+
 PowerPC
 -------
 
