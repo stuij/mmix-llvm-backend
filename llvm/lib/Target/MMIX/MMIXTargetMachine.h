@@ -13,6 +13,7 @@
 #ifndef LLVM_LIB_TARGET_MMIX_MMIXTARGETMACHINE_H
 #define LLVM_LIB_TARGET_MMIX_MMIXTARGETMACHINE_H
 
+#include "MCTargetDesc/MMIXMCTargetDesc.h"
 #include "llvm/CodeGen/SelectionDAGTargetInfo.h"
 #include "llvm/IR/DataLayout.h"
 #include "llvm/Target/TargetMachine.h"
@@ -34,7 +35,6 @@ public:
   }
 };
 
-Target &getTheMMIXTarget();
 } // namespace llvm
 
-#endif
+#endif // LLVM_LIB_TARGET_MMIX_MMIXTARGETMACHINE_H
