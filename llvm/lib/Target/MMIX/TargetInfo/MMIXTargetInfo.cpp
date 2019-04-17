@@ -21,8 +21,3 @@ extern "C" void LLVMInitializeMMIXTargetInfo() {
   RegisterTarget<Triple::mmix> Y(getTheMMIXTarget(), "mmix",
                                     "MMIX", "MMIX");
 }
-
-// FIXME: Temporary stub - this function must be defined for linking
-// to succeed and will be called unconditionally by llc, so must be a no-op.
-// Remove once this function is properly implemented.
-extern "C" void LLVMInitializeMMIXTargetMC() {}
