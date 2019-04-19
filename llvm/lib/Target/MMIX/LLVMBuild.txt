@@ -22,10 +22,11 @@ type = TargetGroup
 name = MMIX
 parent = Target
 has_asmparser = 1
+has_asmprinter = 1
 
 [component_1]
 type = Library
 name = MMIXCodeGen
 parent = MMIX
-required_libraries = Core CodeGen MMIXInfo Support Target
+required_libraries = AsmPrinter Core CodeGen MC MMIXDesc MMIXInfo Support Target
 add_to_library_groups = MMIX
