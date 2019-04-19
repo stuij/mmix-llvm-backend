@@ -23,11 +23,12 @@ using namespace llvm;
 
 namespace {
 class MMIXAsmBackend : public MCAsmBackend {
+  const MCSubtargetInfo &STI;
   uint8_t OSABI;
 
 public:
-  MMIXAsmBackend(uint8_t OSABI)
-      : MCAsmBackend(support::big), OSABI(OSABI) {}
+  MMIXAsmBackend(const MCSubtargetInfo &STI, uint8_t OSABI)
+      : MCAsmBackend(support::big), STI(STI), OSABI(OSABI)  {}
   ~MMIXAsmBackend() override {}
 
   void applyFixup(const MCAssembler &Asm, const MCFixup &Fixup,
@@ -90,5 +91,7 @@ MCAsmBackend *llvm::createMMIXAsmBackend(const Target &T,
                                          const MCSubtargetInfo &STI,
                                          const MCRegisterInfo &MRI,
                                          const MCTargetOptions &Options) {
-  return new MMIXAsmBackend(ELF::ELFOSABI_NONE);
+  const Triple &TT = STI.getTargetTriple();
+  uint8_t OSABI = MCELFObjectTargetWriter::getOSABI(TT.getOS());
+  return new MMIXAsmBackend(STI, OSABI);
 }

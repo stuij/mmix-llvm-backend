@@ -53,4 +53,7 @@ std::unique_ptr<MCObjectTargetWriter> createMMIXELFObjectWriter(uint8_t OSABI);
 #define GET_INSTRINFO_ENUM
 #include "MMIXGenInstrInfo.inc"
 
+#define GET_SUBTARGETINFO_ENUM
+#include "MMIXGenSubtargetInfo.inc"
+
 #endif // LLVM_LIB_TARGET_MMIX_MCTARGETDESC_MMIXMCTARGETDESC_H

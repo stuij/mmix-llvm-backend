@@ -26,6 +26,7 @@ include "MMIXRegisterInfo.td"
 include "MMIXInstrInfo.td"
 
 def MMIXInstrInfo : InstrInfo;
+def MMIXAsmParser : AsmParser;
 
 //===----------------------------------------------------------------------===//
 // MMIX processors supported.
@@ -38,6 +39,7 @@ def : ProcessorModel<"generic", NoSchedModel, []>;
 //===----------------------------------------------------------------------===//
 
 def MMIX : Target {
+  let AssemblyParsers = [MMIXAsmParser];
   // Pull in Instruction Info:
   let InstructionSet = MMIXInstrInfo;
 }
