@@ -11,6 +11,7 @@
 //===----------------------------------------------------------------------===//
 
 #include "MMIXMCTargetDesc.h"
+#include "MMIXInstPrinter.h"
 #include "MMIXMCAsmInfo.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/MC/MCAsmInfo.h"
@@ -60,6 +61,14 @@ static MCSubtargetInfo *createMMIXMCSubtargetInfo(const Triple &TT,
   return createMMIXMCSubtargetInfoImpl(TT, CPUName, FS);
 }
 
+static MCInstPrinter *createMMIXMCInstPrinter(const Triple &T,
+                                              unsigned SyntaxVariant,
+                                              const MCAsmInfo &MAI,
+                                              const MCInstrInfo &MII,
+                                              const MCRegisterInfo &MRI) {
+  return new MMIXInstPrinter(MAI, MII, MRI);
+}
+
 extern "C" void LLVMInitializeMMIXTargetMC() {
   TargetRegistry::RegisterMCAsmInfo(getTheMMIXTarget(),
                                     createMMIXMCAsmInfo);
@@ -73,4 +82,6 @@ extern "C" void LLVMInitializeMMIXTargetMC() {
                                         createMMIXMCCodeEmitter);
   TargetRegistry::RegisterMCSubtargetInfo(getTheMMIXTarget(),
                                           createMMIXMCSubtargetInfo);
+  TargetRegistry::RegisterMCInstPrinter(getTheMMIXTarget(),
+                                        createMMIXMCInstPrinter);
 }
