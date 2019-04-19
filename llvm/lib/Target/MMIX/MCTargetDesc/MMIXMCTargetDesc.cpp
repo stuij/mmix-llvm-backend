@@ -27,6 +27,9 @@
 #define GET_REGINFO_MC_DESC
 #include "MMIXGenRegisterInfo.inc"
 
+#define GET_SUBTARGETINFO_MC_DESC
+#include "MMIXGenSubtargetInfo.inc"
+
 using namespace llvm;
 
 static MCInstrInfo *createMMIXMCInstrInfo() {
@@ -49,6 +52,14 @@ static MCAsmInfo *createMMIXMCAsmInfo(const MCRegisterInfo &MRI,
   return new MMIXMCAsmInfo(TT);
 }
 
+static MCSubtargetInfo *createMMIXMCSubtargetInfo(const Triple &TT,
+                                                  StringRef CPU, StringRef FS) {
+  std::string CPUName = CPU;
+  if (CPUName.empty())
+    CPUName = "generic-mmix";
+  return createMMIXMCSubtargetInfoImpl(TT, CPUName, FS);
+}
+
 extern "C" void LLVMInitializeMMIXTargetMC() {
   TargetRegistry::RegisterMCAsmInfo(getTheMMIXTarget(),
                                     createMMIXMCAsmInfo);
@@ -60,4 +71,6 @@ extern "C" void LLVMInitializeMMIXTargetMC() {
                                        createMMIXAsmBackend);
   TargetRegistry::RegisterMCCodeEmitter(getTheMMIXTarget(),
                                         createMMIXMCCodeEmitter);
+  TargetRegistry::RegisterMCSubtargetInfo(getTheMMIXTarget(),
+                                          createMMIXMCSubtargetInfo);
 }

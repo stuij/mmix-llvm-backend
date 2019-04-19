@@ -20,7 +20,16 @@ include "MMIXInstrFormats.td"
 // Operands
 //===----------------------------------------------------------------------===//
 
-def uimm8 : Operand<i64>;
+class UImmAsmOperand<int width>
+    : AsmOperandClass {
+  let Name = "UImm" # width;
+  let RenderMethod = "addImmOperands";
+  let DiagnosticType = !strconcat("Invalid", Name);
+}
+
+def uimm8 : Operand<i64> {
+  let ParserMatchClass = UImmAsmOperand<8>;
+}
 
 //===----------------------------------------------------------------------===//
 // Instruction Class Templates
