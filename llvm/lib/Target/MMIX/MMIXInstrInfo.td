@@ -29,6 +29,7 @@ class UImmAsmOperand<int width>
 
 def uimm8 : Operand<i64> {
   let ParserMatchClass = UImmAsmOperand<8>;
+  let DecoderMethod = "decodeUImmOperand<8>";
 }
 
 //===----------------------------------------------------------------------===//
