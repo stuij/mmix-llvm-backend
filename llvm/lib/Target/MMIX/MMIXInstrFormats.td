@@ -16,13 +16,19 @@ class MMIXInst<dag outs, dag ins, string opcodestr, string argstr,
              list<dag> pattern>
     : Instruction {
   field bits<32> Inst;
-  let Size = 4;
+  // SoftFail is a field the disassembler can use to provide a way for
+  // instructions to not match without killing the whole decode process. It is
+  // mainly used for ARM, but Tablegen expects this field to exist or it fails
+  // to build the decode table.
+  field bits<32> SoftFail = 0;
 
+  let Size = 4;
   bits<8> Opcode = 0;
 
   let Inst{31-24} = Opcode;
 
   let Namespace = "MMIX";
+  let DecoderNamespace = "MMIX";
 
   dag OutOperandList = outs;
   dag InOperandList = ins;

@@ -6,6 +6,8 @@ tablegen(LLVM MMIXGenMCCodeEmitter.inc -gen-emitter)
 tablegen(LLVM MMIXGenAsmMatcher.inc -gen-asm-matcher)
 tablegen(LLVM MMIXGenAsmWriter.inc -gen-asm-writer)
 tablegen(LLVM MMIXGenSubtargetInfo.inc -gen-subtarget)
+tablegen(LLVM MMIXGenSubtargetInfo.inc -gen-subtarget)
+tablegen(LLVM MMIXGenDisassemblerTables.inc -gen-disassembler)
 
 add_public_tablegen_target(MMIXCommonTableGen)
 
@@ -14,5 +16,6 @@ add_llvm_target(MMIXCodeGen
   )
 
 add_subdirectory(AsmParser)
+add_subdirectory(Disassembler)
 add_subdirectory(MCTargetDesc)
 add_subdirectory(TargetInfo)
