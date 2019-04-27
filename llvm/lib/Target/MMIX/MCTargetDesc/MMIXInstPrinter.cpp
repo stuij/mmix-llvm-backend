@@ -45,10 +45,63 @@ void MMIXInstPrinter::printOperand(const MCInst *MI, unsigned OpNo,
   }
 
   if (MO.isImm()) {
-    O << MO.getImm();
+    O << formatHex(MO.getImm());
     return;
   }
 
   assert(MO.isExpr() && "Unknown operand kind in printOperand");
   MO.getExpr()->print(O, &MAI);
+}
+
+void MMIXInstPrinter::printBranchImm(const MCInst *MI, unsigned OpNum,
+                                     raw_ostream &O) {
+  const MCOperand &Op = MI->getOperand(OpNum);
+  unsigned Opcode = MI->getOpcode();
+
+  // If the label has already been resolved to an immediate offset (say, when
+  // we're running the disassembler), just print the immediate.
+  if (Op.isImm()) {
+    bool back;
+    switch(Opcode) {
+    case MMIX::PUSHJ_B:
+      back = true;
+      break;
+    default:
+      back = false;
+    }
+
+    auto Val = Op.getImm() << 2;
+    if(back) {
+      Val -= 262144;
+    }
+    O << formatHex(Val);
+    return;
+  }
+
+  // Otherwise, just print the expression.
+  MI->getOperand(OpNum).getExpr()->print(O, &MAI);
+}
+
+void MMIXInstPrinter::printJumpImm(const MCInst *MI, unsigned OpNum,
+                                     raw_ostream &O) {
+  const MCOperand &Op = MI->getOperand(OpNum);
+  unsigned Opcode = MI->getOpcode();
+
+  // If the label has already been resolved to an immediate offset (say, when
+  // we're running the disassembler), just print the immediate.
+  if (Op.isImm()) {
+    bool back = false;
+    if (Opcode == MMIX::JMP_B)
+      back = true;
+
+    auto Val = Op.getImm() << 2;
+    if(back) {
+      Val -= 67108864;
+    }
+    O << formatHex(Val);
+    return;
+  }
+
+  // Otherwise, just print the expression.
+  MI->getOperand(OpNum).getExpr()->print(O, &MAI);
 }

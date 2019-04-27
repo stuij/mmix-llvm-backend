@@ -10,6 +10,7 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "MCTargetDesc/MMIXFixupKinds.h"
 #include "MCTargetDesc/MMIXMCTargetDesc.h"
 #include "llvm/ADT/Statistic.h"
 #include "llvm/MC/MCAsmInfo.h"
@@ -54,6 +55,35 @@ public:
   unsigned getMachineOpValue(const MCInst &MI, const MCOperand &MO,
                              SmallVectorImpl<MCFixup> &Fixups,
                              const MCSubtargetInfo &STI) const;
+
+  unsigned getLabelOpValue(const MCInst &Inst, unsigned OpNo,
+                           SmallVectorImpl<MCFixup> &Fixups,
+                           const MCSubtargetInfo &SubtargetInfo,
+                           MCFixupKind Kind) const;
+
+  unsigned getHWydeOpValue(const MCInst &Inst, unsigned OpNo,
+                           SmallVectorImpl<MCFixup> &Fixups,
+                           const MCSubtargetInfo &SubtargetInfo) const;
+
+  unsigned getMHWydeOpValue(const MCInst &Inst, unsigned OpNo,
+                            SmallVectorImpl<MCFixup> &Fixups,
+                            const MCSubtargetInfo &SubtargetInfo) const;
+
+  unsigned getMLWydeOpValue(const MCInst &Inst, unsigned OpNo,
+                            SmallVectorImpl<MCFixup> &Fixups,
+                            const MCSubtargetInfo &SubtargetInfo) const;
+
+  unsigned getLWydeOpValue(const MCInst &Inst, unsigned OpNo,
+                           SmallVectorImpl<MCFixup> &Fixups,
+                           const MCSubtargetInfo &SubtargetInfo) const;
+
+  unsigned getBranchTargetOpValue(const MCInst &Inst, unsigned OpNo,
+                                  SmallVectorImpl<MCFixup> &Fixups,
+                                  const MCSubtargetInfo &SubtargetInfo) const;
+
+  unsigned getJumpTargetOpValue(const MCInst &Inst, unsigned OpNo,
+                                SmallVectorImpl<MCFixup> &Fixups,
+                                const MCSubtargetInfo &SubtargetInfo) const;
 };
 } // end anonymous namespace
 
@@ -84,6 +114,63 @@ MMIXMCCodeEmitter::getMachineOpValue(const MCInst &MI, const MCOperand &MO,
 
   llvm_unreachable("Unhandled expression!");
   return 0;
+}
+
+unsigned MMIXMCCodeEmitter::getBranchTargetOpValue(
+    const MCInst &Inst, unsigned OpNo, SmallVectorImpl<MCFixup> &Fixups,
+    const MCSubtargetInfo &SubtargetInfo) const {
+  const MCOperand &MCOp = Inst.getOperand(OpNo);
+  MCFixupKind Kind = static_cast<MCFixupKind>(MMIX::fixup_mmix_rel_16);
+  Fixups.push_back(MCFixup::create(0, MCOp.getExpr(), Kind));
+  return 0;
+}
+
+unsigned MMIXMCCodeEmitter::getJumpTargetOpValue(
+    const MCInst &Inst, unsigned OpNo, SmallVectorImpl<MCFixup> &Fixups,
+    const MCSubtargetInfo &SubtargetInfo) const {
+  const MCOperand &MCOp = Inst.getOperand(OpNo);
+  MCFixupKind Kind = static_cast<MCFixupKind>(MMIX::fixup_mmix_rel_24);
+  Fixups.push_back(MCFixup::create(0, MCOp.getExpr(), Kind));
+  return 0;
+}
+
+unsigned MMIXMCCodeEmitter::getLabelOpValue(
+    const MCInst &Inst, unsigned OpNo, SmallVectorImpl<MCFixup> &Fixups,
+    const MCSubtargetInfo &SubtargetInfo, MCFixupKind Kind) const {
+  const MCOperand &MCOp = Inst.getOperand(OpNo);
+  if (MCOp.isImm())
+    return getMachineOpValue(Inst, MCOp, Fixups, SubtargetInfo);
+
+  Fixups.push_back(MCFixup::create(0, MCOp.getExpr(), Kind));
+  return 0;
+}
+
+unsigned MMIXMCCodeEmitter::getHWydeOpValue(
+    const MCInst &Inst, unsigned OpNo, SmallVectorImpl<MCFixup> &Fixups,
+    const MCSubtargetInfo &SubtargetInfo) const {
+  return getLabelOpValue(Inst, OpNo, Fixups, SubtargetInfo,
+                         static_cast<MCFixupKind>(MMIX::fixup_mmix_h));
+}
+
+unsigned MMIXMCCodeEmitter::getMHWydeOpValue(
+    const MCInst &Inst, unsigned OpNo, SmallVectorImpl<MCFixup> &Fixups,
+    const MCSubtargetInfo &SubtargetInfo) const {
+  return getLabelOpValue(Inst, OpNo, Fixups, SubtargetInfo,
+                         static_cast<MCFixupKind>(MMIX::fixup_mmix_mh));
+}
+
+unsigned MMIXMCCodeEmitter::getMLWydeOpValue(
+    const MCInst &Inst, unsigned OpNo, SmallVectorImpl<MCFixup> &Fixups,
+    const MCSubtargetInfo &SubtargetInfo) const {
+  return getLabelOpValue(Inst, OpNo, Fixups, SubtargetInfo,
+                         static_cast<MCFixupKind>(MMIX::fixup_mmix_ml));
+}
+
+unsigned MMIXMCCodeEmitter::getLWydeOpValue(
+    const MCInst &Inst, unsigned OpNo, SmallVectorImpl<MCFixup> &Fixups,
+    const MCSubtargetInfo &SubtargetInfo) const {
+  return getLabelOpValue(Inst, OpNo, Fixups, SubtargetInfo,
+                         static_cast<MCFixupKind>(MMIX::fixup_mmix_l));
 }
 
 #include "MMIXGenMCCodeEmitter.inc"

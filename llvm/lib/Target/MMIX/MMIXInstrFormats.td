@@ -47,6 +47,26 @@ class Pseudo<dag outs, dag ins, list<dag> pattern>
   let isCodeGenOnly = 1;
 }
 
+// 1 operand
+class MMIX1op<bits<8> opcode, dag ins, string opcodestr>
+    : MMIXInst<(outs), ins, opcodestr, "$xyz", []> {
+  bits<24> xyz;
+
+  let Opcode = opcode;
+  let Inst{23-0} = xyz;
+}
+
+// 2 operands
+class MMIX2op<bits<8> opcode, dag outs, dag ins, string opcodestr>
+    : MMIXInst<outs, ins, opcodestr, "$x,$yz", []> {
+  bits<8> x;
+  bits<16> yz;
+
+  let Opcode = opcode;
+  let Inst{23-16} = x;
+  let Inst{15-0} = yz;
+}
+
 // 3 operands
 class MMIX3op<bits<8> opcode, dag outs, dag ins, string opcodestr>
     : MMIXInst<outs, ins, opcodestr, "$x,$y,$z", []> {
