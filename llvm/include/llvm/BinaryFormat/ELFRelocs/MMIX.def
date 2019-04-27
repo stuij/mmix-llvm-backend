@@ -2,5 +2,11 @@
 #error "ELF_RELOC must be defined"
 #endif
 
-// No relocation
-ELF_RELOC(R_MMIX_NONE,        0)
+ELF_RELOC(R_MMIX_NONE,   0)
+ELF_RELOC(R_MMIX_DATA,   1)
+ELF_RELOC(R_MMIX_REL_16, 2)
+ELF_RELOC(R_MMIX_REL_24, 3)
+ELF_RELOC(R_MMIX_H,      4)
+ELF_RELOC(R_MMIX_MH,     5)
+ELF_RELOC(R_MMIX_ML,     6)
+ELF_RELOC(R_MMIX_L,      7)

@@ -6,6 +6,7 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "MCTargetDesc/MMIXFixupKinds.h"
 #include "MCTargetDesc/MMIXMCTargetDesc.h"
 #include "llvm/MC/MCELFObjectWriter.h"
 #include "llvm/MC/MCFixup.h"
@@ -29,7 +30,7 @@ protected:
 
 MMIXELFObjectWriter::MMIXELFObjectWriter(uint8_t OSABI)
     : MCELFObjectTargetWriter(/*Is64Bit*/ true, OSABI, ELF::EM_MMIX,
-                              /*HasRelocationAddend*/ true) {}
+                              /*HasRelocationAddend*/ false) {}
 
 MMIXELFObjectWriter::~MMIXELFObjectWriter() {}
 
@@ -37,7 +38,25 @@ unsigned MMIXELFObjectWriter::getRelocType(MCContext &Ctx,
                                            const MCValue &Target,
                                            const MCFixup &Fixup,
                                            bool IsPCRel) const {
-  report_fatal_error("invalid fixup kind!");
+  // Determine the type of the relocation
+  switch ((unsigned)Fixup.getKind()) {
+  default:
+    llvm_unreachable("invalid fixup kind!");
+  case FK_Data_8:
+    return ELF::R_MMIX_DATA;
+  case MMIX::fixup_mmix_rel_16:
+    return ELF::R_MMIX_REL_16;
+  case MMIX::fixup_mmix_rel_24:
+    return ELF::R_MMIX_REL_24;
+  case MMIX::fixup_mmix_h:
+    return ELF::R_MMIX_H;
+  case MMIX::fixup_mmix_mh:
+    return ELF::R_MMIX_MH;
+  case MMIX::fixup_mmix_ml:
+    return ELF::R_MMIX_ML;
+  case MMIX::fixup_mmix_l:
+    return ELF::R_MMIX_L;
+  }
 }
 
 std::unique_ptr<MCObjectTargetWriter>

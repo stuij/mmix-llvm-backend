@@ -124,8 +124,75 @@ public:
     return static_cast<const MCConstantExpr *>(Val)->getValue();
   }
 
+  bool isAcceptableSymbolRef(const MCExpr *Expr) const {
+
+    // It's a simple symbol reference or constant with no addend.
+    if (isa<MCConstantExpr>(Expr) || isa<MCSymbolRefExpr>(Expr))
+      return true;
+
+    const MCBinaryExpr *BE = dyn_cast<MCBinaryExpr>(Expr);
+    if (!BE)
+      return false;
+
+    if (!isa<MCSymbolRefExpr>(BE->getLHS()))
+      return false;
+
+    if (BE->getOpcode() != MCBinaryExpr::Add &&
+        BE->getOpcode() != MCBinaryExpr::Sub)
+      return false;
+
+    // We are able to support the subtraction of two symbol references
+    if (BE->getOpcode() == MCBinaryExpr::Sub &&
+        isa<MCSymbolRefExpr>(BE->getRHS()))
+      return true;
+
+    // See if the addend is is a constant, otherwise there's more going
+    // on here than we can deal with.
+    auto AddendExpr = dyn_cast<MCConstantExpr>(BE->getRHS());
+    if (!AddendExpr)
+      return false;
+
+    // It's some symbol reference + a constant addend
+    return true;
+  }
+
   bool isUImm8() const {
     return (isConstantImm() && isUInt<8>(getConstantImm()));
+  }
+
+  bool isUImm16() const {
+    return (isConstantImm() && isUInt<16>(getConstantImm()));
+  }
+
+  bool isLabelImm16() const {
+    if(isConstantImm()) {
+      return isUInt<16>(getConstantImm());
+    }
+    return isImm() && isAcceptableSymbolRef(getImm());
+  }
+
+  bool isWydeH() const {
+    return isLabelImm16();
+  }
+
+  bool isWydeMH() const {
+    return isLabelImm16();
+  }
+
+  bool isWydeML() const {
+    return isLabelImm16();
+  }
+
+  bool isWydeL() const {
+    return isLabelImm16();
+  }
+
+  bool isBranchImm16() const {
+    return isImm() && isAcceptableSymbolRef(getImm());
+  }
+
+  bool isBranchImm24() const {
+    return isImm() && isAcceptableSymbolRef(getImm());
   }
 
   /// getStartLoc - Gets location of the first token of this operand
@@ -245,9 +312,26 @@ bool MMIXAsmParser::MatchAndEmitInstruction(SMLoc IDLoc, unsigned &Opcode,
     }
     return Error(ErrorLoc, "invalid operand for instruction");
   case Match_InvalidUImm8:
-    SMLoc ErrorLoc = ((MMIXOperand &)*Operands[ErrorInfo]).getStartLoc();
+    ErrorLoc = ((MMIXOperand &)*Operands[ErrorInfo]).getStartLoc();
     return Error(ErrorLoc,
-                 "immediate must be an integer in the range [0, 255]");
+                 "immediate must be an integer in the range [0, 0xff]");
+  case Match_InvalidUImm16:
+    ErrorLoc = ((MMIXOperand &)*Operands[ErrorInfo]).getStartLoc();
+    return Error(ErrorLoc,
+                 "immediate must be an integer in the range [0, 0xffff]");
+  case Match_InvalidWyde:
+    ErrorLoc = ((MMIXOperand &)*Operands[ErrorInfo]).getStartLoc();
+    return Error(ErrorLoc,
+                 "operand must be either a label "
+                 "or an integer in the range [0, 0xffff]");
+  case Match_InvalidBranchImm16:
+    ErrorLoc = ((MMIXOperand &)*Operands[ErrorInfo]).getStartLoc();
+    return Error(ErrorLoc,
+                 "branch operand must be a label");
+  case Match_InvalidBranchImm24:
+    ErrorLoc = ((MMIXOperand &)*Operands[ErrorInfo]).getStartLoc();
+    return Error(ErrorLoc,
+                 "branch operand must be a label");
   }
 
   llvm_unreachable("Unknown match type detected!");
@@ -292,6 +376,10 @@ OperandMatchResultTy MMIXAsmParser::parseRegister(OperandVector &Operands) {
 }
 
 OperandMatchResultTy MMIXAsmParser::parseImmediate(OperandVector &Operands) {
+  SMLoc S = getLoc();
+  SMLoc E = SMLoc::getFromPointer(S.getPointer() - 1);
+  const MCExpr *Res;
+
   switch (getLexer().getKind()) {
   default:
     return MatchOperand_NoMatch;
@@ -300,16 +388,13 @@ OperandMatchResultTy MMIXAsmParser::parseImmediate(OperandVector &Operands) {
   case AsmToken::Plus:
   case AsmToken::Integer:
   case AsmToken::String:
+  case AsmToken::Identifier:
+    if (getParser().parseExpression(Res))
+      return MatchOperand_ParseFail;
     break;
   }
 
-  const MCExpr *IdVal;
-  SMLoc S = getLoc();
-  if (getParser().parseExpression(IdVal))
-    return MatchOperand_ParseFail;
-
-  SMLoc E = SMLoc::getFromPointer(S.getPointer() - 1);
-  Operands.push_back(MMIXOperand::createImm(IdVal, S, E));
+  Operands.push_back(MMIXOperand::createImm(Res, S, E));
   return MatchOperand_Success;
 }
 
