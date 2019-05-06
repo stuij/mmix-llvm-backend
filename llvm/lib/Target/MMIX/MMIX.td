@@ -23,9 +23,13 @@ def : ProcessorModel<"generic-mmix", NoSchedModel, []>;
 //===----------------------------------------------------------------------===//
 
 include "MMIXRegisterInfo.td"
+include "MMIXCallingConv.td"
 include "MMIXInstrInfo.td"
 
-def MMIXInstrInfo : InstrInfo;
+def MMIXInstrInfo : InstrInfo {
+  let guessInstructionProperties = 0;
+}
+
 def MMIXAsmParser : AsmParser;
 
 //===----------------------------------------------------------------------===//

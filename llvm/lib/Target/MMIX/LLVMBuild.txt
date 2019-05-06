@@ -29,5 +29,6 @@ has_disassembler = 1
 type = Library
 name = MMIXCodeGen
 parent = MMIX
-required_libraries = AsmPrinter Core CodeGen MC MMIXDesc MMIXInfo Support Target
+required_libraries = AsmPrinter Core CodeGen MC MMIXDesc MMIXInfo
+  SelectionDAG Support Target
 add_to_library_groups = MMIX
