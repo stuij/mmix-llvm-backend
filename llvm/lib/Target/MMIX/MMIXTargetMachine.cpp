@@ -10,6 +10,7 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "MMIX.h"
 #include "MMIXTargetMachine.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/CodeGen/Passes.h"
@@ -50,10 +51,31 @@ MMIXTargetMachine::MMIXTargetMachine(const Target &T, const Triple &TT,
     : LLVMTargetMachine(T, computeDataLayout(TT), TT, CPU, FS, Options,
                         getEffectiveRelocModel(TT, RM),
                         getEffectiveCodeModel(CM, CodeModel::Small), OL),
-      TLOF(std::make_unique<TargetLoweringObjectFileELF>()) {
+      TLOF(std::make_unique<TargetLoweringObjectFileELF>()),
+      Subtarget(TT, CPU, FS, *this) {
   initAsmInfo();
 }
 
+namespace {
+class MMIXPassConfig : public TargetPassConfig {
+public:
+  MMIXPassConfig(MMIXTargetMachine &TM, PassManagerBase &PM)
+      : TargetPassConfig(TM, PM) {}
+
+  MMIXTargetMachine &getMMIXTargetMachine() const {
+    return getTM<MMIXTargetMachine>();
+  }
+
+  bool addInstSelector() override;
+};
+}
+
 TargetPassConfig *MMIXTargetMachine::createPassConfig(PassManagerBase &PM) {
-  return new TargetPassConfig(*this, PM);
+  return new MMIXPassConfig(*this, PM);
+}
+
+bool MMIXPassConfig::addInstSelector() {
+  addPass(createMMIXISelDag(getMMIXTargetMachine()));
+
+  return false;
 }

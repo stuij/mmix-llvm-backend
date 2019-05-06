@@ -17,6 +17,13 @@
 include "MMIXInstrFormats.td"
 
 //===----------------------------------------------------------------------===//
+// MMIX specific DAG Nodes.
+//===----------------------------------------------------------------------===//
+
+def RetFlag : SDNode<"MMIXISD::RET_FLAG", SDTNone,
+                     [SDNPHasChain, SDNPOptInGlue, SDNPVariadic]>;
+
+//===----------------------------------------------------------------------===//
 // Operands
 //===----------------------------------------------------------------------===//
 
@@ -27,12 +34,12 @@ class UImmAsmOperand<int width>
   let DiagnosticType = !strconcat("Invalid", Name);
 }
 
-def uimm8 : Operand<i64> {
+def uimm8 : Operand<i64>, ImmLeaf<i64, [{return isUInt<8>(Imm);}]> {
   let ParserMatchClass = UImmAsmOperand<8>;
   let DecoderMethod = "decodeUImmOperand<8>";
 }
 
-def uimm16 : Operand<i64> {
+def uimm16 : Operand<i64>, ImmLeaf<i64, [{return isUInt<16>(Imm);}]> {
   let ParserMatchClass = UImmAsmOperand<16>;
   let DecoderMethod = "decodeUImmOperand<16>";
 }
@@ -133,3 +140,26 @@ def POP : MMIX2op<0xf8, (outs), (ins uimm8:$x, uimm16:$yz), "pop">;
 
 def JMP_F : MMIX1op<0xf0, (ins jmp_imm:$xyz), "jmp">;
 def JMP_B : MMIX1op<0xf1, (ins jmp_imm:$xyz), "jmp">;
+
+//===----------------------------------------------------------------------===//
+// Pseudo-instructions and codegen patterns
+//
+// Naming convention: For 'generic' pattern classes, we use the naming
+// convention PatTy1Ty2. For pattern classes which offer a more complex
+// expension, prefix the class name, e.g. BccPat.
+//===----------------------------------------------------------------------===//
+
+/// Generic pattern classes
+class PatGprGpr<SDPatternOperator OpNode, ALU3op Inst>
+    : Pat<(OpNode GPR:$y, GPR:$z), (Inst GPR:$y, GPR:$z)>;
+class PatGprUimm8<SDPatternOperator OpNode, ALU3op Inst>
+    : Pat<(OpNode GPR:$y, uimm8:$z), (Inst GPR:$y, uimm8:$z)>;
+
+/// Simple arithmetic operations
+def : PatGprGpr<add, ADD_R>;
+def : PatGprUimm8<add, ADD_I>;
+
+/// Branches, jumps and returns
+let isBarrier = 1, isReturn = 1, isTerminator = 1 in
+def PseudoRET : Pseudo<(outs), (ins), [(RetFlag)]>,
+                PseudoInstExpansion<(POP 0, 0)>;
