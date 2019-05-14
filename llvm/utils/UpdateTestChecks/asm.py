@@ -59,6 +59,12 @@ ASM_FUNCTION_MIPS_RE = re.compile(
                                               # .Lfunc_end0: (mips64 - NewABI)
     flags=(re.M | re.S))
 
+ASM_FUNCTION_MMIX_RE = re.compile(
+    r'^_?(?P<func>[^:]+):[ \t]*%+[ \t]*@(?P=func)\n[^:]*?'
+    r'(?P<body>.*?)\s*'
+    r'.Lfunc_end[0-9]+:\n',
+    flags=(re.M | re.S))
+
 ASM_FUNCTION_MSP430_RE = re.compile(
     r'^_?(?P<func>[^:]+):[ \t]*;+[ \t]*@(?P=func)\n[^:]*?'
     r'(?P<body>.*?)\n'
@@ -238,6 +244,16 @@ def scrub_asm_mips(asm, args):
   asm = common.SCRUB_TRAILING_WHITESPACE_RE.sub(r'', asm)
   return asm
 
+def scrub_asm_mmix(asm, args):
+  # Scrub runs of whitespace out of the assembly, but leave the leading
+  # whitespace in place.
+  asm = common.SCRUB_WHITESPACE_RE.sub(r' ', asm)
+  # Expand the tabs used for indentation.
+  asm = string.expandtabs(asm, 2)
+  # Strip trailing whitespace.
+  asm = common.SCRUB_TRAILING_WHITESPACE_RE.sub(r'', asm)
+  return asm
+
 def scrub_asm_msp430(asm, args):
   # Scrub runs of whitespace out of the assembly, but leave the leading
   # whitespace in place.
@@ -332,6 +348,7 @@ def build_function_body_dictionary_for_triple(args, raw_tool_output, triple, pre
       'thumbv5-macho': (scrub_asm_arm_eabi, ASM_FUNCTION_ARM_MACHO_RE),
       'thumbv7-apple-ios' : (scrub_asm_arm_eabi, ASM_FUNCTION_ARM_IOS_RE),
       'mips': (scrub_asm_mips, ASM_FUNCTION_MIPS_RE),
+      'mmix': (scrub_asm_mmix, ASM_FUNCTION_MMIX_RE),
       'msp430': (scrub_asm_msp430, ASM_FUNCTION_MSP430_RE),
       'ppc32': (scrub_asm_powerpc, ASM_FUNCTION_PPC_RE),
       'powerpc': (scrub_asm_powerpc, ASM_FUNCTION_PPC_RE),
