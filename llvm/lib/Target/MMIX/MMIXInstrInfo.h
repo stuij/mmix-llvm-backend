@@ -25,6 +25,9 @@ class MMIXInstrInfo : public MMIXGenInstrInfo {
 
 public:
   MMIXInstrInfo();
+
+  void expandLDImm(MachineBasicBlock::iterator MI) const;
+  bool expandPostRAPseudo(MachineInstr &MI) const override;
 };
 }
 
