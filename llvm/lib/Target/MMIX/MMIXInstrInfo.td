@@ -44,6 +44,9 @@ def uimm16 : Operand<i64>, ImmLeaf<i64, [{return isUInt<16>(Imm);}]> {
   let DecoderMethod = "decodeUImmOperand<16>";
 }
 
+def imm64 : Operand<i64>, ImmLeaf<i64, [{return isInt<64>(Imm);}]>;
+
+
 // immediate wyde operands: INCH, SETMH, ORML, ANDNL, etc..
 class WydeAsmOperand<string pos>
     : AsmOperandClass {
@@ -52,25 +55,25 @@ class WydeAsmOperand<string pos>
   let DiagnosticType = "InvalidWyde";
 }
 
-def h_imm : Operand<OtherVT> {
+def h_imm : Operand<i64> {
   let ParserMatchClass = WydeAsmOperand<"H">;
   let EncoderMethod = "getHWydeOpValue";
   let DecoderMethod = "decodeUImmOperand<16>";
 }
 
-def mh_imm : Operand<OtherVT> {
+def mh_imm : Operand<i64> {
   let ParserMatchClass = WydeAsmOperand<"MH">;
   let EncoderMethod = "getMHWydeOpValue";
   let DecoderMethod = "decodeUImmOperand<16>";
 }
 
-def ml_imm : Operand<OtherVT> {
+def ml_imm : Operand<i64> {
   let ParserMatchClass = WydeAsmOperand<"ML">;
   let EncoderMethod = "getMLWydeOpValue";
   let DecoderMethod = "decodeUImmOperand<16>";
 }
 
-def l_imm : Operand<OtherVT> {
+def l_imm : Operand<i64> {
   let ParserMatchClass = WydeAsmOperand<"L">;
   let EncoderMethod = "getLWydeOpValue";
   let DecoderMethod = "decodeUImmOperand<16>";
@@ -102,7 +105,7 @@ def jmp_imm : Operand<OtherVT> {
 // Instruction Class Templates
 //===----------------------------------------------------------------------===//
 
-// ALUs
+/// ALUs
 // 3 operand ALUs
 class ALU3op<bits<8> opcode, dag ins, string opname>
     : MMIX3op<opcode, (outs GPR:$x), ins, opname> {
@@ -119,17 +122,23 @@ defm ADD : ALU3multi<0x20, "add">;
 class ALU2op<bits<8> opcode, string opname>
     : MMIX2op<opcode, (outs GPR:$x), (ins uimm16:$yz), opname>;
 
-// 'Wyde' instructions get their own parent class because of label operand
+
+/// 'Wyde' instructions get their own parent class because of label operand
 class Wyde2op<bits<8> opcode, string opname, dag ins>
     : MMIX2op<opcode, (outs GPR:$x), ins, opname>;
 
-def SETH : Wyde2op<0xe0, "seth", (ins h_imm:$yz)>;
+def SETH  : Wyde2op<0xe0, "seth", (ins h_imm:$yz)>;
+def SETMH : Wyde2op<0xe1, "setmh", (ins mh_imm:$yz)>;
+def SETML : Wyde2op<0xe2, "setml", (ins ml_imm:$yz)>;
+def SETL  : Wyde2op<0xe3, "setl", (ins l_imm:$yz)>;
+
 def ORH  : Wyde2op<0xe8, "orh", (ins h_imm:$yz)>;
 def ORMH : Wyde2op<0xe9, "ormh", (ins mh_imm:$yz)>;
 def ORML : Wyde2op<0xea, "orml", (ins ml_imm:$yz)>;
 def ORL  : Wyde2op<0xeb, "orl", (ins l_imm:$yz)>;
 
-// control flow
+
+/// control flow
 let isCall = 1, mayLoad = 1 in
 def PUSHJ_F : MMIX2op<0xf2, (outs), (ins GPR:$x, branch_imm:$yz), "pushj">;
 let isCall = 1, mayLoad = 1 in
@@ -149,15 +158,25 @@ def JMP_B : MMIX1op<0xf1, (ins jmp_imm:$xyz), "jmp">;
 // expension, prefix the class name, e.g. BccPat.
 //===----------------------------------------------------------------------===//
 
+/// Immediates
+// load immediate
+def LDI : Pseudo<(outs GPR:$x), (ins imm64:$yz), []>;
+
+def : Pat<(uimm16:$yz), (SETL uimm16:$yz)>;
+def : Pat<(imm64:$yz), (LDI imm64:$yz)>;
+
+
 /// Generic pattern classes
 class PatGprGpr<SDPatternOperator OpNode, ALU3op Inst>
     : Pat<(OpNode GPR:$y, GPR:$z), (Inst GPR:$y, GPR:$z)>;
 class PatGprUimm8<SDPatternOperator OpNode, ALU3op Inst>
     : Pat<(OpNode GPR:$y, uimm8:$z), (Inst GPR:$y, uimm8:$z)>;
 
+
 /// Simple arithmetic operations
 def : PatGprGpr<add, ADD_R>;
 def : PatGprUimm8<add, ADD_I>;
+
 
 /// Branches, jumps and returns
 let isBarrier = 1, isReturn = 1, isTerminator = 1 in

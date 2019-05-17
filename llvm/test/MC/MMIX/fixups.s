@@ -11,6 +11,24 @@ address:
 # CHECK-DISASS: e0 01 fe eb     seth $1,0xfeeb
   seth $1,address + 0xfeebdaeddeadbeef
 
+# CHECK-INST: setmh $1,address-77727853370818833
+# CHECK: encoding: [0xe1'A',0x01'A',0x00,0x00]
+# CHECK: fixup A - offset: 0, value: address-77727853370818833, kind: fixup_mmix_mh
+# CHECK-DISASS: e1 01 da ed     setmh $1,0xdaed
+  setmh $1,address + 0xfeebdaeddeadbeef
+
+# CHECK-INST: setml $1,address-77727853370818833
+# CHECK: encoding: [0xe2'A',0x01'A',0x00,0x00]
+# CHECK: fixup A - offset: 0, value: address-77727853370818833, kind: fixup_mmix_ml
+# CHECK-DISASS: e2 01 de ad     setml $1,0xdead
+  setml $1,address + 0xfeebdaeddeadbeef
+
+# CHECK-INST: setl $1,address-77727853370818833
+# CHECK: encoding: [0xe3'A',0x01'A',0x00,0x00]
+# CHECK: fixup A - offset: 0, value: address-77727853370818833, kind: fixup_mmix_l
+# CHECK-DISASS: e3 01 be ef     setl $1,0xbeef
+  setl $1,address + 0xfeebdaeddeadbeef
+
 # CHECK-INST: orh $1,address-77727853370818833
 # CHECK: encoding: [0xe8'A',0x01'A',0x00,0x00]
 # CHECK: fixup A - offset: 0, value: address-77727853370818833, kind: fixup_mmix_h

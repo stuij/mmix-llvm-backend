@@ -31,6 +31,21 @@
 # CHECK-DISASS: e0 01 ff ff     seth $1,0xffff
   seth $1,0xffff
 
+# CHECK-INST: setmh $2,0xff00
+# CHECK: encoding: [0xe1,0x02,0xff,0x00]
+# CHECK-DISASS: e1 02 ff 00     setmh $2,0xff00
+  setmh $2,0xff00
+
+# CHECK-INST: setml $1,0xffff
+# CHECK: encoding: [0xe2,0x01,0xff,0xff]
+# CHECK-DISASS: e2 01 ff ff     setml $1,0xffff
+  setml $1,0xffff
+
+# CHECK-INST: setl $1,0xffff
+# CHECK: encoding: [0xe3,0x01,0xff,0xff]
+# CHECK-DISASS: e3 01 ff ff     setl $1,0xffff
+  setl $1,0xffff
+
 # CHECK-INST: orh $1,0x0
 # CHECK: encoding: [0xe8,0x01,0x00,0x00]
 # CHECK-DISASS: e8 01 00 00     orh $1,0x0
