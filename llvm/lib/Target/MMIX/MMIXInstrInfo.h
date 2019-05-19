@@ -26,6 +26,10 @@ class MMIXInstrInfo : public MMIXGenInstrInfo {
 public:
   MMIXInstrInfo();
 
+  void copyPhysReg(MachineBasicBlock &MBB, MachineBasicBlock::iterator MBBI,
+                   const DebugLoc &DL, MCRegister DstReg, MCRegister SrcReg,
+                   bool KillSrc) const override;
+
   void expandLDImm(MachineBasicBlock::iterator MI) const;
   bool expandPostRAPseudo(MachineInstr &MI) const override;
 };

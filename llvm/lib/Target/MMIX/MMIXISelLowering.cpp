@@ -46,6 +46,9 @@ MMIXTargetLowering::MMIXTargetLowering(const TargetMachine &TM,
 
   setStackPointerRegisterToSaveRestore(MMIX::r254);
 
+  for (auto N : {ISD::EXTLOAD, ISD::SEXTLOAD, ISD::ZEXTLOAD})
+    setLoadExtAction(N, MVT::i64, MVT::i1, Promote);
+
   // TODO: add all necessary setOperationAction calls.
 
   setBooleanContents(ZeroOrOneBooleanContent);
