@@ -29,6 +29,18 @@ using namespace llvm;
 
 MMIXInstrInfo::MMIXInstrInfo() : MMIXGenInstrInfo() {}
 
+void MMIXInstrInfo::copyPhysReg(MachineBasicBlock &MBB,
+                                MachineBasicBlock::iterator MBBI,
+                                const DebugLoc &DL, MCRegister DstReg,
+                                MCRegister SrcReg, bool KillSrc) const {
+  assert(MMIX::GPRRegClass.contains(DstReg, SrcReg) &&
+         "Impossible reg-to-reg copy");
+
+  BuildMI(MBB, MBBI, DL, get(MMIX::ADD_I), DstReg)
+      .addReg(SrcReg, getKillRegState(KillSrc))
+      .addImm(0);
+}
+
 void MMIXInstrInfo::expandLDImm(MachineBasicBlock::iterator MI) const {
   // The dest reg is dead. No use in loading the immediate.
   if (MI->getOperand(0).isDead())

@@ -20,3 +20,26 @@ define i64 @addi(i64 %a) nounwind {
   %1 = add i64 %a, 1
   ret i64 %1
 }
+
+define i64 @sub(i64 %a, i64 %b) nounwind {
+; CHECK-LABEL: sub:
+; CHECK:       % %bb.0:
+; CHECK-NEXT:    sub $231,$231,$232
+; CHECK-NEXT:    pop 0x0,0x0
+  %1 = sub i64 %a, %b
+  ret i64 %1
+}
+
+;; TODO: no sub immediate pattern available? Why not: sub $16,$16,0xff
+define i64 @subi(i64 %a) nounwind {
+; CHECK-LABEL: subi:
+; CHECK:       % %bb.0:
+; CHECK-NEXT:    seth $16,0xffff
+; CHECK-NEXT:    ormh $16,0xffff
+; CHECK-NEXT:    orml $16,0xffff
+; CHECK-NEXT:    orl $16,0xff01
+; CHECK-NEXT:    add $231,$231,$16
+; CHECK-NEXT:    pop 0x0,0x0
+  %1 = sub i64 %a, 255
+  ret i64 %1
+}

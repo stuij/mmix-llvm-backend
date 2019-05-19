@@ -116,7 +116,10 @@ multiclass ALU3multi<bits<8> opcode, string opname> {
   def _I : ALU3op<!add(opcode, 1), (ins GPR:$y, uimm8:$z), opname>;
 }
 
-defm ADD : ALU3multi<0x20, "add">;
+defm ADD    : ALU3multi<0x20, "add">;
+defm ADDU   : ALU3multi<0x22, "addu">;
+defm SUB    : ALU3multi<0x24, "sub">;
+defm SUBU   : ALU3multi<0x26, "subu">;
 
 // 2 operand ALUs
 class ALU2op<bits<8> opcode, string opname>
@@ -150,6 +153,50 @@ def POP : MMIX2op<0xf8, (outs), (ins uimm8:$x, uimm16:$yz), "pop">;
 def JMP_F : MMIX1op<0xf0, (ins jmp_imm:$xyz), "jmp">;
 def JMP_B : MMIX1op<0xf1, (ins jmp_imm:$xyz), "jmp">;
 
+
+/// load and store
+// signed and unsigned extended loads
+let mayLoad = 1 in
+class LD3op<bits<8> opcode, dag ins, string opname>
+    : MMIX3op<opcode, (outs GPR:$x), ins, opname> {
+}
+
+multiclass LD3multi<bits<8> opcode, string opname> {
+  def _R : LD3op<opcode, (ins GPR:$y, GPR:$z), opname>;
+  def _I : LD3op<!add(opcode, 1), (ins GPR:$y, uimm8:$z), opname>;
+}
+
+defm LDB  : LD3multi<0x80, "ldb">;
+defm LDBU : LD3multi<0x82, "ldbu">;
+defm LDW  : LD3multi<0x84, "ldw">;
+defm LDWU : LD3multi<0x86, "ldwu">;
+defm LDT  : LD3multi<0x88, "ldt">;
+defm LDTU : LD3multi<0x8A, "ldtu">;
+defm LDO  : LD3multi<0x8C, "ldo">;
+defm LDOU : LD3multi<0x8E, "ldou">;
+
+
+// store
+let mayStore = 1 in
+class ST3op<bits<8> opcode, dag ins, string opname>
+    : MMIX3op<opcode, (outs), ins, opname> {
+}
+
+multiclass ST3multi<bits<8> opcode, string opname> {
+  def _R : ST3op<opcode, (ins GPR:$x, GPR:$y, GPR:$z), opname>;
+  def _I : ST3op<!add(opcode, 1), (ins GPR:$x, GPR:$y, uimm8:$z), opname>;
+}
+
+defm STB  : ST3multi<0xA0, "stb">;
+defm STBU : ST3multi<0xA2, "stbu">;
+defm STW  : ST3multi<0xA4, "stw">;
+defm STWU : ST3multi<0xA6, "stwu">;
+defm STT  : ST3multi<0xA8, "stt">;
+defm STTU : ST3multi<0xAA, "sttu">;
+defm STO  : ST3multi<0xAC, "sto">;
+defm STOU : ST3multi<0xAE, "stou">;
+
+
 //===----------------------------------------------------------------------===//
 // Pseudo-instructions and codegen patterns
 //
@@ -174,11 +221,53 @@ class PatGprUimm8<SDPatternOperator OpNode, ALU3op Inst>
 
 
 /// Simple arithmetic operations
-def : PatGprGpr<add, ADD_R>;
-def : PatGprUimm8<add, ADD_I>;
+multiclass AluPat<PatFrag AluOp, string op> {
+  def : PatGprGpr<AluOp, !cast<ALU3op>(op#_R)>;
+  def : PatGprUimm8<AluOp, !cast<ALU3op>(op#_I)>;
+}
+
+defm : AluPat<add, "ADD">;
+defm : AluPat<sub, "SUB">;
 
 
 /// Branches, jumps and returns
 let isBarrier = 1, isReturn = 1, isTerminator = 1 in
 def PseudoRET : Pseudo<(outs), (ins), [(RetFlag)]>,
                 PseudoInstExpansion<(POP 0, 0)>;
+
+
+/// load and store
+// signed and unsigned extended loads
+multiclass LdPat<PatFrag LoadOp, LD3op Inst> {
+  def : Pat<(LoadOp GPR:$y), (Inst GPR:$y, 0)>;
+  def : Pat<(LoadOp (add GPR:$y, uimm8:$z)),
+            (Inst GPR:$y, uimm8:$z)>;
+}
+
+// load i8
+defm : LdPat<extloadi8, LDB_I>;
+defm : LdPat<sextloadi8, LDB_I>;
+defm : LdPat<zextloadi8, LDBU_I>;
+// load i16
+defm : LdPat<extloadi16, LDW_I>;
+defm : LdPat<sextloadi16, LDW_I>;
+defm : LdPat<zextloadi16, LDWU_I>;
+// load i32
+defm : LdPat<extloadi32, LDT_I>;
+defm : LdPat<sextloadi32, LDT_I>;
+defm : LdPat<zextloadi32, LDTU_I>;
+// load i64
+defm : LdPat<load, LDO_I>;
+
+
+// store
+multiclass StPat<PatFrag StoreOp, ST3op Inst> {
+  def : Pat<(StoreOp GPR:$x, GPR:$y), (Inst GPR:$x, GPR:$y, 0)>;
+  def : Pat<(StoreOp GPR:$x, (add GPR:$y, uimm8:$z)),
+            (Inst GPR:$x, GPR:$y, uimm8:$z)>;
+}
+
+defm : StPat<truncstorei8, STB_I>;
+defm : StPat<truncstorei16, STW_I>;
+defm : StPat<truncstorei32, STT_I>;
+defm : StPat<store, STO_I>;
