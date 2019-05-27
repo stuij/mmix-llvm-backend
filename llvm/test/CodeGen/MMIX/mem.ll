@@ -200,6 +200,34 @@ define i16 @load_sext_zext_anyext_i1_i16(i1 *%a) nounwind {
   ret i16 %7
 }
 
+; Check load and store to a global
+@G = global i64 0
+
+define i64 @lw_sw_global(i64 %a) nounwind {
+; CHECK-LABEL: lw_sw_global:
+; CHECK:       % %bb.0:
+; CHECK-NEXT:    seth $17,G
+; CHECK-NEXT:    ormh $17,G
+; CHECK-NEXT:    orml $17,G
+; CHECK-NEXT:    orl $17,G
+; CHECK-NEXT:    ldo $16,$17,0x0
+; CHECK-NEXT:    sto $231,$17,0x0
+; CHECK-NEXT:    seth $17,G+72
+; CHECK-NEXT:    ormh $17,G+72
+; CHECK-NEXT:    orml $17,G+72
+; CHECK-NEXT:    orl $17,G+72
+; CHECK-NEXT:    ldo $18,$17,0x0
+; CHECK-NEXT:    sto $231,$17,0x0
+; CHECK-NEXT:    add $231,$16,0x0
+; CHECK-NEXT:    pop 0x0,0x0
+  %1 = load volatile i64, i64* @G
+  store i64 %a, i64* @G
+  %2 = getelementptr i64, i64* @G, i64 9
+  %3 = load volatile i64, i64* %2
+  store i64 %a, i64* %2
+  ret i64 %1
+}
+
 
 ; Check load/store operations on values wider than what is natively supported
 
@@ -211,5 +239,25 @@ define i128 @load_i128(i128 *%a) nounwind {
 ; CHECK-NEXT:    add $231,$16,0x0
 ; CHECK-NEXT:    pop 0x0,0x0
   %1 = load i128, i128* %a
+  ret i128 %1
+}
+
+@val128 = local_unnamed_addr global i128 340282366920938463463374607431768211456, align 8
+
+define i128 @load_i128_global() nounwind {
+; CHECK-LABEL: load_i128_global:
+; CHECK:       % %bb.0:
+; CHECK-NEXT:    seth $16,val128
+; CHECK-NEXT:    ormh $16,val128
+; CHECK-NEXT:    orml $16,val128
+; CHECK-NEXT:    orl $16,val128
+; CHECK-NEXT:    ldo $231,$16,0x0
+; CHECK-NEXT:    seth $16,val128+8
+; CHECK-NEXT:    ormh $16,val128+8
+; CHECK-NEXT:    orml $16,val128+8
+; CHECK-NEXT:    orl $16,val128+8
+; CHECK-NEXT:    ldo $232,$16,0x0
+; CHECK-NEXT:    pop 0x0,0x0
+  %1 = load i128, i128* @val128
   ret i128 %1
 }

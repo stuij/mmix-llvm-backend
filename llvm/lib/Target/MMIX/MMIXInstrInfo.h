@@ -31,6 +31,7 @@ public:
                    bool KillSrc) const override;
 
   void expandLDImm(MachineBasicBlock::iterator MI) const;
+  void expandLDAddr(MachineBasicBlock::iterator MI) const;
   bool expandPostRAPseudo(MachineInstr &MI) const override;
 };
 }

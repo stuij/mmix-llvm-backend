@@ -34,6 +34,8 @@ public:
   explicit MMIXTargetLowering(const TargetMachine &TM,
                               const MMIXSubtarget &STI);
 
+  SDValue LowerGlobalAddress(SDValue Op, SelectionDAG &DAG) const;
+
   // Provide custom lowering hooks for some operations.
   SDValue LowerOperation(SDValue Op, SelectionDAG &DAG) const override;
 

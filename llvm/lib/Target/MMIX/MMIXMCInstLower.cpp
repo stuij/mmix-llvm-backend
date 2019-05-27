@@ -12,6 +12,7 @@
 //===----------------------------------------------------------------------===//
 
 #include "MMIX.h"
+#include "llvm/CodeGen/AsmPrinter.h"
 #include "llvm/CodeGen/MachineBasicBlock.h"
 #include "llvm/CodeGen/MachineInstr.h"
 #include "llvm/MC/MCAsmInfo.h"
@@ -23,8 +24,19 @@
 
 using namespace llvm;
 
-void llvm::LowerMMIXMachineInstrToMCInst(const MachineInstr *MI,
-                                          MCInst &OutMI) {
+MCOperand LowerSymbolOperand(const MachineOperand &MO, const AsmPrinter &AP) {
+  MCContext &Ctx = AP.OutContext;
+  const MCExpr *Expr = MCSymbolRefExpr::create(AP.getSymbol(MO.getGlobal()),
+                                               MCSymbolRefExpr::VK_None, Ctx);
+  if (!MO.isJTI() && MO.getOffset())
+    Expr = MCBinaryExpr::createAdd(
+        Expr, MCConstantExpr::create(MO.getOffset(), Ctx), Ctx);
+
+  return MCOperand::createExpr(Expr);
+}
+
+void llvm::LowerMMIXMachineInstrToMCInst(const MachineInstr *MI, MCInst &OutMI,
+                                         const AsmPrinter &AP) {
   OutMI.setOpcode(MI->getOpcode());
 
   for (const MachineOperand &MO : MI->operands()) {
@@ -41,6 +53,9 @@ void llvm::LowerMMIXMachineInstrToMCInst(const MachineInstr *MI,
       break;
     case MachineOperand::MO_Immediate:
       MCOp = MCOperand::createImm(MO.getImm());
+      break;
+    case MachineOperand::MO_GlobalAddress:
+      MCOp = LowerSymbolOperand(MO, AP);
       break;
     }
 

@@ -208,6 +208,7 @@ defm STOU : ST3multi<0xAE, "stou">;
 /// Immediates
 // load immediate
 def LDI : Pseudo<(outs GPR:$x), (ins imm64:$yz), []>;
+def LDA : Pseudo<(outs GPR:$x), (ins imm64:$yz), []>;
 
 def : Pat<(uimm16:$yz), (SETL uimm16:$yz)>;
 def : Pat<(imm64:$yz), (LDI imm64:$yz)>;
