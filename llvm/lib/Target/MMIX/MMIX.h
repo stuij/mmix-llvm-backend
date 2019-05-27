@@ -19,10 +19,14 @@
 
 namespace llvm {
 class MMIXTargetMachine;
+class AsmPrinter;
 class MCInst;
+class MCOperand;
 class MachineInstr;
+class MachineOperand;
 
-void LowerMMIXMachineInstrToMCInst(const MachineInstr *MI, MCInst &OutMI);
+void LowerMMIXMachineInstrToMCInst(const MachineInstr *MI, MCInst &OutMI,
+                                   const AsmPrinter &AP);
 
 FunctionPass *createMMIXISelDag(MMIXTargetMachine &TM);
 }

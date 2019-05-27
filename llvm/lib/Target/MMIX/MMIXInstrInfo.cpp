@@ -66,10 +66,39 @@ void MMIXInstrInfo::expandLDImm(MachineBasicBlock::iterator MI) const {
   MBB->erase(MI);
 }
 
+void MMIXInstrInfo::expandLDAddr(MachineBasicBlock::iterator MI) const {
+  // The dest reg is dead. No use in loading the address.
+  if (MI->getOperand(0).isDead())
+    return;
+
+  DebugLoc DL = MI->getDebugLoc();
+   MachineBasicBlock *MBB = MI->getParent();
+
+  BuildMI(*MBB, MI, DL, get(MMIX::SETH))
+      .add(MI->getOperand(0))
+      .add(MI->getOperand(1));
+  BuildMI(*MBB, MI, DL, get(MMIX::ORMH))
+      .add(MI->getOperand(0))
+      .add(MI->getOperand(1));
+  BuildMI(*MBB, MI, DL, get(MMIX::ORML))
+      .add(MI->getOperand(0))
+      .add(MI->getOperand(1));
+  BuildMI(*MBB, MI, DL, get(MMIX::ORL))
+      .add(MI->getOperand(0))
+      .add(MI->getOperand(1));
+
+  MBB->erase(MI);
+}
+
 bool MMIXInstrInfo::expandPostRAPseudo(MachineInstr &MI) const {
-  if (MI.getOpcode() == MMIX::LDI) {
+  switch (MI.getOpcode()) {
+  default:
+    return false;
+  case MMIX::LDI:
     expandLDImm(MI);
     return true;
+  case MMIX::LDA:
+    expandLDAddr(MI);
+    return true;
   }
-  return false;
 }

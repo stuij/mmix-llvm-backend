@@ -55,7 +55,7 @@ void MMIXAsmPrinter::EmitInstruction(const MachineInstr *MI) {
     return;
 
   MCInst TmpInst;
-  LowerMMIXMachineInstrToMCInst(MI, TmpInst);
+  LowerMMIXMachineInstrToMCInst(MI, TmpInst, *this);
   EmitToStreamer(*OutStreamer, TmpInst);
 }
 

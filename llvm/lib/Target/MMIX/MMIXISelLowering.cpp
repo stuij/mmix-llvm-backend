@@ -50,6 +50,7 @@ MMIXTargetLowering::MMIXTargetLowering(const TargetMachine &TM,
     setLoadExtAction(N, MVT::i64, MVT::i1, Promote);
 
   // TODO: add all necessary setOperationAction calls.
+  setOperationAction(ISD::GlobalAddress, MVT::i64, Custom);
 
   setBooleanContents(ZeroOrOneBooleanContent);
 
@@ -58,11 +59,26 @@ MMIXTargetLowering::MMIXTargetLowering(const TargetMachine &TM,
   setPrefFunctionAlignment(Align(4));
 }
 
+SDValue MMIXTargetLowering::LowerGlobalAddress(SDValue Op,
+                                               SelectionDAG &DAG) const {
+  SDLoc DL(Op);
+  EVT Ty = Op.getValueType();
+  GlobalAddressSDNode *N = cast<GlobalAddressSDNode>(Op);
+  const GlobalValue *GV = N->getGlobal();
+  int64_t Offset = N->getOffset();
+
+  SDValue GA = DAG.getTargetGlobalAddress(GV, DL, Ty, Offset);
+
+  return SDValue(DAG.getMachineNode(MMIX::LDA, DL, MVT::i64, GA), 0);
+}
+
 SDValue MMIXTargetLowering::LowerOperation(SDValue Op,
                                            SelectionDAG &DAG) const {
   switch (Op.getOpcode()) {
   default:
     report_fatal_error("unimplemented operand");
+    case ISD::GlobalAddress:
+      return LowerGlobalAddress(Op, DAG);
   }
 }
 
