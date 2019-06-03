@@ -64,6 +64,22 @@ void MMIXInstPrinter::printBranchImm(const MCInst *MI, unsigned OpNum,
     bool back;
     switch(Opcode) {
     case MMIX::PUSHJ_B:
+    case MMIX::BN_B:
+    case MMIX::BZ_B:
+    case MMIX::BP_B:
+    case MMIX::BOD_B:
+    case MMIX::BNN_B:
+    case MMIX::BNZ_B:
+    case MMIX::BNP_B:
+    case MMIX::BEV_B:
+    case MMIX::PBN_B:
+    case MMIX::PBZ_B:
+    case MMIX::PBP_B:
+    case MMIX::PBOD_B:
+    case MMIX::PBNN_B:
+    case MMIX::PBNZ_B:
+    case MMIX::PBNP_B:
+    case MMIX::PBEV_B:
       back = true;
       break;
     default:

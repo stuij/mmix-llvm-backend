@@ -35,30 +35,40 @@ MCOperand LowerSymbolOperand(const MachineOperand &MO, const AsmPrinter &AP) {
   return MCOperand::createExpr(Expr);
 }
 
+bool llvm::LowerMMIXMachineOperandToMCOperand(const MachineOperand &MO,
+                                              MCOperand &MCOp,
+                                              const AsmPrinter &AP) {
+  switch (MO.getType()) {
+  default:
+    report_fatal_error(
+        "LowerMMIXMachineInstrToMCInst: unknown operand type");
+  case MachineOperand::MO_Register:
+    // Ignore all implicit register operands.
+    if (MO.isImplicit())
+      return false;
+    MCOp = MCOperand::createReg(MO.getReg());
+    break;
+  case MachineOperand::MO_Immediate:
+    MCOp = MCOperand::createImm(MO.getImm());
+    break;
+  case MachineOperand::MO_MachineBasicBlock:
+    MCOp = MCOperand::createExpr(
+        MCSymbolRefExpr::create(MO.getMBB()->getSymbol(), AP.OutContext));
+    break;
+  case MachineOperand::MO_GlobalAddress:
+    MCOp = LowerSymbolOperand(MO, AP);
+    break;
+  }
+  return true;
+}
+
 void llvm::LowerMMIXMachineInstrToMCInst(const MachineInstr *MI, MCInst &OutMI,
                                          const AsmPrinter &AP) {
   OutMI.setOpcode(MI->getOpcode());
 
   for (const MachineOperand &MO : MI->operands()) {
     MCOperand MCOp;
-    switch (MO.getType()) {
-    default:
-      report_fatal_error(
-          "LowerMMIXMachineInstrToMCInst: unknown operand type");
-    case MachineOperand::MO_Register:
-      // Ignore all implicit register operands.
-      if (MO.isImplicit())
-        continue;
-      MCOp = MCOperand::createReg(MO.getReg());
-      break;
-    case MachineOperand::MO_Immediate:
-      MCOp = MCOperand::createImm(MO.getImm());
-      break;
-    case MachineOperand::MO_GlobalAddress:
-      MCOp = LowerSymbolOperand(MO, AP);
-      break;
-    }
-
-    OutMI.addOperand(MCOp);
+    if (LowerMMIXMachineOperandToMCOperand(MO, MCOp, AP))
+      OutMI.addOperand(MCOp);
   }
 }

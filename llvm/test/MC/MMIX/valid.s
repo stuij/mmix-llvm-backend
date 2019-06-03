@@ -51,6 +51,145 @@
 # CHECK-DISASS: 27 98 27 d8     subu $152,$39,0xd8
   subu $152,$39,0xd8
 
+# CHECK-INST: addu2 $227,$109,$38
+# CHECK: encoding: [0x28,0xe3,0x6d,0x26]
+# CHECK-DISASS: 28 e3 6d 26     addu2 $227,$109,$38
+  addu2 $227,$109,$38
+
+# CHECK-INST: addu2 $245,$82,0xaa
+# CHECK: encoding: [0x29,0xf5,0x52,0xaa]
+# CHECK-DISASS: 29 f5 52 aa     addu2 $245,$82,0xaa
+  addu2 $245,$82,0xaa
+
+# CHECK-INST: addu4 $62,$207,$36
+# CHECK: encoding: [0x2a,0x3e,0xcf,0x24]
+# CHECK-DISASS: 2a 3e cf 24     addu4 $62,$207,$36
+  addu4 $62,$207,$36
+
+# CHECK-INST: addu4 $1,$17,0xc0
+# CHECK: encoding: [0x2b,0x01,0x11,0xc0]
+# CHECK-DISASS: 2b 01 11 c0     addu4 $1,$17,0xc0
+  addu4 $1,$17,0xc0
+
+# CHECK-INST: addu8 $7,$100,$147
+# CHECK: encoding: [0x2c,0x07,0x64,0x93]
+# CHECK-DISASS: 2c 07 64 93     addu8 $7,$100,$147
+  addu8 $7,$100,$147
+
+# CHECK-INST: addu8 $28,$217,0xac
+# CHECK: encoding: [0x2d,0x1c,0xd9,0xac]
+# CHECK-DISASS: 2d 1c d9 ac     addu8 $28,$217,0xac
+  addu8 $28,$217,0xac
+
+# CHECK-INST: addu16 $147,$80,$215
+# CHECK: encoding: [0x2e,0x93,0x50,0xd7]
+# CHECK-DISASS: 2e 93 50 d7     addu16 $147,$80,$215
+  addu16 $147,$80,$215
+
+# CHECK-INST: addu16 $213,$115,0xe4
+# CHECK: encoding: [0x2f,0xd5,0x73,0xe4]
+# CHECK-DISASS: 2f d5 73 e4     addu16 $213,$115,0xe4
+  addu16 $213,$115,0xe4
+
+# CHECK-INST: cmp $111,$171,$244
+# CHECK: encoding: [0x30,0x6f,0xab,0xf4]
+# CHECK-DISASS: 30 6f ab f4     cmp $111,$171,$244
+  cmp $111,$171,$244
+
+# CHECK-INST: cmp $19,$182,0x6
+# CHECK: encoding: [0x31,0x13,0xb6,0x06]
+# CHECK-DISASS: 31 13 b6 06     cmp $19,$182,0x6
+  cmp $19,$182,0x6
+
+# CHECK-INST: cmpu $235,$87,$62
+# CHECK: encoding: [0x32,0xeb,0x57,0x3e]
+# CHECK-DISASS: 32 eb 57 3e     cmpu $235,$87,$62
+  cmpu $235,$87,$62
+
+# CHECK-INST: cmpu $185,$163,0xb2
+# CHECK: encoding: [0x33,0xb9,0xa3,0xb2]
+# CHECK-DISASS: 33 b9 a3 b2     cmpu $185,$163,0xb2
+  cmpu $185,$163,0xb2
+
+# CHECK-INST: or $66,$142,$150
+# CHECK: encoding: [0xc0,0x42,0x8e,0x96]
+# CHECK-DISASS: c0 42 8e 96     or $66,$142,$150
+  or $66,$142,$150
+
+# CHECK-INST: or $13,$188,0x7b
+# CHECK: encoding: [0xc1,0x0d,0xbc,0x7b]
+# CHECK-DISASS: c1 0d bc 7b     or $13,$188,0x7b
+  or $13,$188,0x7b
+
+# CHECK-INST: orn $60,$106,$232
+# CHECK: encoding: [0xc2,0x3c,0x6a,0xe8]
+# CHECK-DISASS: c2 3c 6a e8     orn $60,$106,$232
+  orn $60,$106,$232
+
+# CHECK-INST: orn $13,$149,0xc1
+# CHECK: encoding: [0xc3,0x0d,0x95,0xc1]
+# CHECK-DISASS: c3 0d 95 c1     orn $13,$149,0xc1
+  orn $13,$149,0xc1
+
+# CHECK-INST: nor $98,$52,$219
+# CHECK: encoding: [0xc4,0x62,0x34,0xdb]
+# CHECK-DISASS: c4 62 34 db     nor $98,$52,$219
+  nor $98,$52,$219
+
+# CHECK-INST: nor $48,$155,0x21
+# CHECK: encoding: [0xc5,0x30,0x9b,0x21]
+# CHECK-DISASS: c5 30 9b 21     nor $48,$155,0x21
+  nor $48,$155,0x21
+
+# CHECK-INST: xor $197,$78,$128
+# CHECK: encoding: [0xc6,0xc5,0x4e,0x80]
+# CHECK-DISASS: c6 c5 4e 80     xor $197,$78,$128
+  xor $197,$78,$128
+
+# CHECK-INST: xor $145,$61,0x7d
+# CHECK: encoding: [0xc7,0x91,0x3d,0x7d]
+# CHECK-DISASS: c7 91 3d 7d     xor $145,$61,0x7d
+  xor $145,$61,0x7d
+
+# CHECK-INST: and $15,$182,$0
+# CHECK: encoding: [0xc8,0x0f,0xb6,0x00]
+# CHECK-DISASS: c8 0f b6 00     and $15,$182,$0
+  and $15,$182,$0
+
+# CHECK-INST: and $53,$44,0x16
+# CHECK: encoding: [0xc9,0x35,0x2c,0x16]
+# CHECK-DISASS: c9 35 2c 16     and $53,$44,0x16
+  and $53,$44,0x16
+
+# CHECK-INST: andn $16,$33,$123
+# CHECK: encoding: [0xca,0x10,0x21,0x7b]
+# CHECK-DISASS: ca 10 21 7b     andn $16,$33,$123
+  andn $16,$33,$123
+
+# CHECK-INST: andn $227,$73,0x1d
+# CHECK: encoding: [0xcb,0xe3,0x49,0x1d]
+# CHECK-DISASS: cb e3 49 1d     andn $227,$73,0x1d
+  andn $227,$73,0x1d
+
+# CHECK-INST: nand $16,$118,$203
+# CHECK: encoding: [0xcc,0x10,0x76,0xcb]
+# CHECK-DISASS: cc 10 76 cb     nand $16,$118,$203
+  nand $16,$118,$203
+
+# CHECK-INST: nand $144,$207,0xc
+# CHECK: encoding: [0xcd,0x90,0xcf,0x0c]
+# CHECK-DISASS: cd 90 cf 0c     nand $144,$207,0xc
+  nand $144,$207,0xc
+
+# CHECK-INST: nxor $67,$103,$42
+# CHECK: encoding: [0xce,0x43,0x67,0x2a]
+# CHECK-DISASS: ce 43 67 2a     nxor $67,$103,$42
+  nxor $67,$103,$42
+
+# CHECK-INST: nxor $113,$192,0xef
+# CHECK: encoding: [0xcf,0x71,0xc0,0xef]
+# CHECK-DISASS: cf 71 c0 ef     nxor $113,$192,0xef
+  nxor $113,$192,0xef
 
 # Wyde instructions
 

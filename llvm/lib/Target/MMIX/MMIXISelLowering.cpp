@@ -51,6 +51,7 @@ MMIXTargetLowering::MMIXTargetLowering(const TargetMachine &TM,
 
   // TODO: add all necessary setOperationAction calls.
   setOperationAction(ISD::GlobalAddress, MVT::i64, Custom);
+  setOperationAction(ISD::BR_CC, MVT::i64, Expand);
 
   setBooleanContents(ZeroOrOneBooleanContent);
 
