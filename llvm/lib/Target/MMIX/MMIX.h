@@ -25,6 +25,8 @@ class MCOperand;
 class MachineInstr;
 class MachineOperand;
 
+bool LowerMMIXMachineOperandToMCOperand(const MachineOperand &MO,
+                                        MCOperand &MCOp, const AsmPrinter &AP);
 void LowerMMIXMachineInstrToMCInst(const MachineInstr *MI, MCInst &OutMI,
                                    const AsmPrinter &AP);
 

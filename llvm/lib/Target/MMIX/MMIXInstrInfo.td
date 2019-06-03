@@ -120,6 +120,23 @@ defm ADD    : ALU3multi<0x20, "add">;
 defm ADDU   : ALU3multi<0x22, "addu">;
 defm SUB    : ALU3multi<0x24, "sub">;
 defm SUBU   : ALU3multi<0x26, "subu">;
+// TODO: these should be 2ADDU, etc. Need more work in the asm parser
+defm ADDU2  : ALU3multi<0x28, "addu2">;
+defm ADDU4  : ALU3multi<0x2a, "addu4">;
+defm ADDU8  : ALU3multi<0x2c, "addu8">;
+defm ADDU16 : ALU3multi<0x2e, "addu16">;
+defm CMP    : ALU3multi<0x30, "cmp">;
+defm CMPU   : ALU3multi<0x32, "cmpu">;
+
+defm OR     : ALU3multi<0xc0, "or">;
+defm ORN    : ALU3multi<0xc2, "orn">;
+defm NOR    : ALU3multi<0xc4, "nor">;
+defm XOR    : ALU3multi<0xc6, "xor">;
+defm AND    : ALU3multi<0xc8, "and">;
+defm ANDN   : ALU3multi<0xca, "andn">;
+defm NAND   : ALU3multi<0xcc, "nand">;
+defm NXOR   : ALU3multi<0xce, "nxor">;
+
 
 // 2 operand ALUs
 class ALU2op<bits<8> opcode, string opname>
@@ -146,6 +163,28 @@ let isCall = 1, mayLoad = 1 in
 def PUSHJ_F : MMIX2op<0xf2, (outs), (ins GPR:$x, branch_imm:$yz), "pushj">;
 let isCall = 1, mayLoad = 1 in
 def PUSHJ_B : MMIX2op<0xf3, (outs), (ins GPR:$x, branch_imm:$yz), "pushj">;
+
+
+class BR2op<bits<8> opcode, string opname> :
+    MMIX2op<opcode, (outs), (ins GPR:$x, branch_imm:$yz), opname>;
+
+let isCall = 1, mayLoad = 1 in
+multiclass BR2multi<bits<8> opcode, string opname> {
+  def _F : BR2op<opcode, opname>;
+  def _B : BR2op<!add(opcode, 1), opname>;
+  def P#NAME#_F : BR2op<!add(opcode, 0x10), "p" # opname>;
+  def P#NAME#_B : BR2op<!add(opcode, 0x11), "p" # opname>;
+}
+
+defm BN  : BR2multi<0x40, "bn">;
+defm BZ  : BR2multi<0x42, "bz">;
+defm BP  : BR2multi<0x44, "bp">;
+defm BOD : BR2multi<0x46, "bod">;
+defm BNN : BR2multi<0x48, "bnn">;
+defm BNZ : BR2multi<0x4a, "bnz">;
+defm BNP : BR2multi<0x4c, "bnp">;
+defm BEV : BR2multi<0x4e, "bev">;
+
 
 let isReturn = 1, mayStore = 1 in
 def POP : MMIX2op<0xf8, (outs), (ins uimm8:$x, uimm16:$yz), "pop">;
@@ -229,9 +268,39 @@ multiclass AluPat<PatFrag AluOp, string op> {
 
 defm : AluPat<add, "ADD">;
 defm : AluPat<sub, "SUB">;
-
+defm : AluPat<and, "AND">;
 
 /// Branches, jumps and returns
+
+// Match `(brcond (CondOp ..), ..)` and lower to the appropriate MMIX branch
+// pattern.
+class BccPat<PatFrag CondOp, BR2op BrInst, ALU3op AluInst>
+    : Pat<(brcond (i64 (CondOp GPR:$y, GPR:$z)), bb:$yz),
+          (BrInst (AluInst GPR:$y, GPR:$z), branch_imm:$yz)>;
+
+def : BccPat<seteq,  BZ_F,  CMP_R>;
+def : BccPat<setgt,  BP_F,  CMP_R>;
+def : BccPat<setge,  BNN_F, CMP_R>;
+def : BccPat<setlt,  BN_F,  CMP_R>;
+def : BccPat<setle,  BNP_F, CMP_R>;
+def : BccPat<setne,  BNZ_F, CMP_R>;
+
+def : BccPat<setueq, BZ_F,  CMPU_R>;
+def : BccPat<setugt, BP_F,  CMPU_R>;
+def : BccPat<setuge, BNN_F, CMPU_R>;
+def : BccPat<setult, BN_F,  CMPU_R>;
+def : BccPat<setule, BNP_F, CMPU_R>;
+def : BccPat<setune, BNZ_F, CMPU_R>;
+
+// An extra pattern is needed for a brcond without a setcc (i.e. where the
+// condition was calculated elsewhere).
+def : Pat<(brcond GPR:$cond, bb:$addr), (BNZ_F GPR:$cond, bb:$addr)>;
+
+let isBarrier = 1, isBranch = 1, isTerminator = 1 in
+def PseudoBR : Pseudo<(outs), (ins jmp_imm:$xyz), [(br bb:$xyz)]>,
+               PseudoInstExpansion<(JMP_F jmp_imm:$xyz)>;
+
+
 let isBarrier = 1, isReturn = 1, isTerminator = 1 in
 def PseudoRET : Pseudo<(outs), (ins), [(RetFlag)]>,
                 PseudoInstExpansion<(POP 0, 0)>;
