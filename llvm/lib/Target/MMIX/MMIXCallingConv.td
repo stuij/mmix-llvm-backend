@@ -25,4 +25,7 @@ def CC_MMIX : CallingConv<[
   CCAssignToStack<8, 8>
 ]>;
 
-def CSR : CalleeSavedRegs<(add r253, (sequence "r%u", 0, 15))>;
+def CSR : CalleeSavedRegs<(add rJ, r253, (sequence "r%u", 0, 15))>;
+
+// Needed for implementation of MMIXRegisterInfo::getNoPreservedMask()
+def CSR_NoRegs : CalleeSavedRegs<(add)>;
