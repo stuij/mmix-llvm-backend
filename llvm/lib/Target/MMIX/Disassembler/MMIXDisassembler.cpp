@@ -123,6 +123,28 @@ static DecodeStatus DecodeGPRRegisterClass(MCInst &Inst, uint64_t RegNo,
    return MCDisassembler::Success;
 }
 
+
+static const unsigned SRDecoderTable[] = {
+  MMIX::rB,   MMIX::rD,  MMIX::rE,   MMIX::rH,  MMIX::rJ,
+  MMIX::rM,   MMIX::rR,  MMIX::rBB,  MMIX::rC,  MMIX::rN,
+  MMIX::rO,   MMIX::rS,  MMIX::rI,   MMIX::rT,  MMIX::rTT,
+  MMIX::rK,   MMIX::rQ,  MMIX::rU,   MMIX::rV,  MMIX::rG,
+  MMIX::rL,   MMIX::rA,  MMIX::rF,   MMIX::rP,  MMIX::rW,
+  MMIX::rX,   MMIX::rY,  MMIX::rZ,   MMIX::rWW, MMIX::rXX,
+  MMIX::rYY,  MMIX::rZZ
+};
+
+static DecodeStatus DecodeSRRegisterClass(MCInst &Inst, uint64_t RegNo,
+                                           uint64_t Address,
+                                           const void *Decoder) {
+   if (RegNo > sizeof(SRDecoderTable))
+     return MCDisassembler::Fail;
+
+   unsigned Reg = SRDecoderTable[RegNo];
+   Inst.addOperand(MCOperand::createReg(Reg));
+   return MCDisassembler::Success;
+}
+
 template <unsigned N>
 static DecodeStatus decodeUImmOperand(MCInst &Inst, uint64_t Imm,
                                       int64_t Address, const void *Decoder) {
