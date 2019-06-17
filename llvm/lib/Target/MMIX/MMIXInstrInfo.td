@@ -193,6 +193,10 @@ def JMP_F : MMIX1op<0xf0, (ins jmp_imm:$xyz), "jmp">;
 def JMP_B : MMIX1op<0xf1, (ins jmp_imm:$xyz), "jmp">;
 
 
+/// put and get
+def PUT : MMIX2opNoY<0xf6, (outs SR:$x), (ins GPR:$z), "put">;
+def GET : MMIX2opNoY<0xfe, (outs GPR:$x), (ins SR:$z), "get">;
+
 /// load and store
 // signed and unsigned extended loads
 let mayLoad = 1 in
@@ -328,7 +332,6 @@ defm : LdPat<sextloadi32, LDT_I>;
 defm : LdPat<zextloadi32, LDTU_I>;
 // load i64
 defm : LdPat<load, LDO_I>;
-
 
 // store
 multiclass StPat<PatFrag StoreOp, ST3op Inst> {

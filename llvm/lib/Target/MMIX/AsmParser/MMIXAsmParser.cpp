@@ -356,6 +356,7 @@ bool MMIXAsmParser::ParseRegister(unsigned &RegNo, SMLoc &StartLoc,
 OperandMatchResultTy MMIXAsmParser::parseRegister(OperandVector &Operands) {
   SMLoc S = getLoc();
   SMLoc E;
+  StringRef Name;
 
   switch (getLexer().getKind()) {
   default:
@@ -363,15 +364,21 @@ OperandMatchResultTy MMIXAsmParser::parseRegister(OperandVector &Operands) {
   case AsmToken::Dollar:
     getLexer().Lex();
     assert(getLexer().getKind() == AsmToken::Integer && "This token isn't an integer!");
-    StringRef Name(std::string("$") + getLexer().getTok().getString().str());
-    unsigned RegNo = MatchRegisterName(Name);
-    E = SMLoc::getFromPointer(getLoc().getPointer() - 1);
-    if (RegNo == 0) {
-      return MatchOperand_NoMatch;
-    }
-    Operands.push_back(MMIXOperand::createReg(RegNo, S, E));
-    getLexer().Lex();
+    Name = StringRef(std::string("$") + getLexer().getTok().getString().str());
+    break;
+  case AsmToken::Identifier:
+    Name = getLexer().getTok().getIdentifier();
+    break;
   }
+
+  unsigned RegNo = MatchRegisterName(Name);
+  E = SMLoc::getFromPointer(getLoc().getPointer() - 1);
+  if (RegNo == 0) {
+    return MatchOperand_NoMatch;
+  }
+  Operands.push_back(MMIXOperand::createReg(RegNo, S, E));
+  getLexer().Lex();
+
   return MatchOperand_Success;
 }
 

@@ -68,8 +68,8 @@ class MMIX2op<bits<8> opcode, dag outs, dag ins, string opcodestr>
 }
 
 // 3 operands
-class MMIX3op<bits<8> opcode, dag outs, dag ins, string opcodestr>
-    : MMIXInst<outs, ins, opcodestr, "$x,$y,$z", []> {
+class MMIX3x<bits<8> opcode, dag outs, dag ins, string opcodestr, string argstr>
+    : MMIXInst<outs, ins, opcodestr, argstr, []> {
   bits<8> x;
   bits<8> y;
   bits<8> z;
@@ -79,3 +79,10 @@ class MMIX3op<bits<8> opcode, dag outs, dag ins, string opcodestr>
   let Inst{15-8} = y;
   let Inst{7-0} = z;
 }
+
+class MMIX3op<bits<8> opcode, dag outs, dag ins, string opcodestr>
+    : MMIX3x<opcode, outs, ins, opcodestr, "$x,$y,$z">;
+
+let y = 0 in
+class MMIX2opNoY<bits<8> opcode, dag outs, dag ins, string opcodestr>
+    : MMIX3x<opcode, outs, ins, opcodestr, "$x,$z">;

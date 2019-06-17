@@ -400,3 +400,16 @@
 # CHECK: encoding: [0xaf,0x90,0xf5,0xe7]
 # CHECK-DISASS: af 90 f5 e7     stou $144,$245,0xe7
   stou $144,$245,0xe7
+
+
+# get/put special registers
+
+# CHECK-INST: put rA,$7
+# CHECK: encoding: [0xf6,0x15,0x00,0x07]
+# CHECK-DISASS: f6 15 00 07     put rA,$7
+  put rA,$7
+
+# CHECK-INST: get $3,rJ
+# CHECK: encoding: [0xfe,0x03,0x00,0x04]
+# CHECK-DISASS: fe 03 00 04     get $3,rJ
+  get $3,rJ
