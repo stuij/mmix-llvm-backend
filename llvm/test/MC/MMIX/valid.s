@@ -402,6 +402,19 @@
   stou $144,$245,0xe7
 
 
+# non-relocation branching
+
+# CHECK-INST: pushgo $31,$107,$90
+# CHECK: encoding: [0xbe,0x1f,0x6b,0x5a]
+# CHECK-DISASS: be 1f 6b 5a     pushgo $31,$107,$90
+  pushgo $31,$107,$90
+
+# CHECK-INST: pushgo $181,$150,0x26
+# CHECK: encoding: [0xbf,0xb5,0x96,0x26]
+# CHECK-DISASS: bf b5 96 26     pushgo $181,$150,0x26
+  pushgo $181,$150,0x26
+
+
 # get/put special registers
 
 # CHECK-INST: put rA,$7

@@ -40,15 +40,54 @@ MMIXRegisterInfo::getCalleeSavedRegs(const MachineFunction *MF) const {
 
 BitVector MMIXRegisterInfo::getReservedRegs(const MachineFunction &MF) const {
   BitVector Reserved(getNumRegs());
+
+  markSuperRegs(Reserved, MMIX::r254); // sp
+  markSuperRegs(Reserved, MMIX::r253); // frame register
+  markSuperRegs(Reserved, MMIX::r252); // tmp link register
+
   return Reserved;
+}
+
+const uint32_t *MMIXRegisterInfo::getNoPreservedMask() const {
+  return CSR_NoRegs_RegMask;
 }
 
 void MMIXRegisterInfo::eliminateFrameIndex(MachineBasicBlock::iterator II,
                                            int SPAdj, unsigned FIOperandNum,
                                            RegScavenger *RS) const {
-  report_fatal_error("Subroutines not supported yet");
+  // TODO: this implementation is a temporary placeholder which does just
+  // enough to allow other aspects of code generation to be tested
+
+  assert(SPAdj == 0 && "Unexpected non-zero SPAdj value");
+
+  MachineInstr &MI = *II;
+  MachineFunction &MF = *MI.getParent()->getParent();
+  const TargetFrameLowering *TFI = MF.getSubtarget().getFrameLowering();
+  DebugLoc DL = MI.getDebugLoc();
+
+  unsigned FrameReg = getFrameRegister(MF);
+  int FrameIndex = MI.getOperand(FIOperandNum).getIndex();
+  int Offset = TFI->getFrameIndexReference(MF, FrameIndex, FrameReg);
+  Offset += MI.getOperand(FIOperandNum + 1).getImm();
+
+  assert(TFI->hasFP(MF) && "eliminateFrameIndex currently requires hasFP");
+
+  // Offsets must be directly encoded in a 16-bit immediate field
+  if (Offset < -262144 || Offset > 262140) {
+    report_fatal_error(
+        "Frame offsets outside of -262144 - 262140 range not supported");
+  }
+
+  MI.getOperand(FIOperandNum).ChangeToRegister(FrameReg, false);
+  MI.getOperand(FIOperandNum + 1).ChangeToImmediate(Offset);
 }
 
 Register MMIXRegisterInfo::getFrameRegister(const MachineFunction &MF) const {
   return MMIX::r253;
+}
+
+const uint32_t *
+MMIXRegisterInfo::getCallPreservedMask(const MachineFunction & /*MF*/,
+                                       CallingConv::ID /*CC*/) const {
+  return CSR_RegMask;
 }

@@ -20,8 +20,22 @@ include "MMIXInstrFormats.td"
 // MMIX specific DAG Nodes.
 //===----------------------------------------------------------------------===//
 
-def RetFlag : SDNode<"MMIXISD::RET_FLAG", SDTNone,
-                     [SDNPHasChain, SDNPOptInGlue, SDNPVariadic]>;
+def SDT_MMIXCall         : SDTypeProfile<0, -1, [SDTCisVT<0, i64>]>;
+def SDT_MMIXCallSeqStart : SDCallSeqStart<[SDTCisVT<0, i64>,
+                                           SDTCisVT<1, i64>]>;
+def SDT_MMIXCallSeqEnd   : SDCallSeqEnd<[SDTCisVT<0, i64>,
+                                         SDTCisVT<1, i64>]>;
+
+
+def Call         : SDNode<"MMIXISD::CALL", SDT_MMIXCall,
+                          [SDNPHasChain, SDNPOptInGlue, SDNPOutGlue,
+                           SDNPVariadic]>;
+def CallSeqStart : SDNode<"ISD::CALLSEQ_START", SDT_MMIXCallSeqStart,
+                          [SDNPHasChain, SDNPOutGlue]>;
+def CallSeqEnd   : SDNode<"ISD::CALLSEQ_END", SDT_MMIXCallSeqEnd,
+                          [SDNPHasChain, SDNPOptInGlue, SDNPOutGlue]>;
+def RetFlag      : SDNode<"MMIXISD::RET_FLAG", SDTNone,
+                          [SDNPHasChain, SDNPOptInGlue, SDNPVariadic]>;
 
 //===----------------------------------------------------------------------===//
 // Operands
@@ -164,6 +178,11 @@ def PUSHJ_F : MMIX2op<0xf2, (outs), (ins GPR:$x, branch_imm:$yz), "pushj">;
 let isCall = 1, mayLoad = 1 in
 def PUSHJ_B : MMIX2op<0xf3, (outs), (ins GPR:$x, branch_imm:$yz), "pushj">;
 
+let isCall = 1, mayLoad = 1 in
+def PUSHGO_R : MMIX3op<0xbe, (outs), (ins GPR:$x, GPR:$y, GPR:$z), "pushgo">;
+let isCall = 1, mayLoad = 1 in
+def PUSHGO_I : MMIX3op<0xbf, (outs), (ins GPR:$x, GPR:$y, uimm8:$z), "pushgo">;
+
 
 class BR2op<bits<8> opcode, string opname> :
     MMIX2op<opcode, (outs), (ins GPR:$x, branch_imm:$yz), opname>;
@@ -304,6 +323,9 @@ let isBarrier = 1, isBranch = 1, isTerminator = 1 in
 def PseudoBR : Pseudo<(outs), (ins jmp_imm:$xyz), [(br bb:$xyz)]>,
                PseudoInstExpansion<(JMP_F jmp_imm:$xyz)>;
 
+let isCall = 1, Defs=[rJ] in
+def PseudoCALL : Pseudo<(outs), (ins GPR:$x), [(Call GPR:$x)]>,
+                 PseudoInstExpansion<(PUSHGO_I r0, GPR:$x, 0)>;
 
 let isBarrier = 1, isReturn = 1, isTerminator = 1 in
 def PseudoRET : Pseudo<(outs), (ins), [(RetFlag)]>,
@@ -344,3 +366,13 @@ defm : StPat<truncstorei8, STB_I>;
 defm : StPat<truncstorei16, STW_I>;
 defm : StPat<truncstorei32, STT_I>;
 defm : StPat<store, STO_I>;
+
+
+/// Other pseudo-instructions
+// Pessimistically assume the stack pointer will be clobbered
+let Defs = [r254], Uses = [r254] in {
+def ADJCALLSTACKDOWN : Pseudo<(outs), (ins i64imm:$amt1, i64imm:$amt2),
+                              [(CallSeqStart timm:$amt1, timm:$amt2)]>;
+def ADJCALLSTACKUP   : Pseudo<(outs), (ins i64imm:$amt1, i64imm:$amt2),
+                              [(CallSeqEnd timm:$amt1, timm:$amt2)]>;
+}
