@@ -52,6 +52,9 @@ MMIXTargetLowering::MMIXTargetLowering(const TargetMachine &TM,
   // TODO: add all necessary setOperationAction calls.
   setOperationAction(ISD::GlobalAddress, MVT::i64, Custom);
   setOperationAction(ISD::BR_CC, MVT::i64, Expand);
+  setOperationAction(ISD::SELECT, MVT::i64, Custom);
+  setOperationAction(ISD::SELECT_CC, MVT::i64, Expand);
+  setOperationAction(ISD::SIGN_EXTEND_INREG, MVT::i32, Expand);
 
   setBooleanContents(ZeroOrOneBooleanContent);
 
@@ -73,6 +76,11 @@ SDValue MMIXTargetLowering::LowerGlobalAddress(SDValue Op,
   return SDValue(DAG.getMachineNode(MMIX::LDA, DL, MVT::i64, GA), 0);
 }
 
+SDValue MMIXTargetLowering::LowerSELECT(SDValue Op,
+                                        SelectionDAG &DAG) const {
+  return Op;
+}
+
 SDValue MMIXTargetLowering::LowerOperation(SDValue Op,
                                            SelectionDAG &DAG) const {
   switch (Op.getOpcode()) {
@@ -80,6 +88,8 @@ SDValue MMIXTargetLowering::LowerOperation(SDValue Op,
     report_fatal_error("unimplemented operand");
     case ISD::GlobalAddress:
       return LowerGlobalAddress(Op, DAG);
+    case ISD::SELECT:
+      return LowerSELECT(Op, DAG);
   }
 }
 
@@ -313,7 +323,6 @@ const char *MMIXTargetLowering::getTargetNodeName(unsigned Opcode) const {
     return "MMIXISD::RET_FLAG";
   case MMIXISD::CALL:
     return "MMIXISD::CALL";
-
   }
   return nullptr;
 }

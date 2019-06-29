@@ -111,6 +111,166 @@
 # CHECK-DISASS: 33 b9 a3 b2     cmpu $185,$163,0xb2
   cmpu $185,$163,0xb2
 
+# CHECK-INST: csn $107,$72,$56
+# CHECK: encoding: [0x60,0x6b,0x48,0x38]
+# CHECK-DISASS: 60 6b 48 38     csn $107,$72,$56
+  csn $107,$72,$56
+
+# CHECK-INST: csn $107,$210,0x2c
+# CHECK: encoding: [0x61,0x6b,0xd2,0x2c]
+# CHECK-DISASS: 61 6b d2 2c     csn $107,$210,0x2c
+  csn $107,$210,0x2c
+
+# CHECK-INST: csz $61,$53,$228
+# CHECK: encoding: [0x62,0x3d,0x35,0xe4]
+# CHECK-DISASS: 62 3d 35 e4     csz $61,$53,$228
+  csz $61,$53,$228
+
+# CHECK-INST: csz $129,$251,0xbd
+# CHECK: encoding: [0x63,0x81,0xfb,0xbd]
+# CHECK-DISASS: 63 81 fb bd     csz $129,$251,0xbd
+  csz $129,$251,0xbd
+
+# CHECK-INST: csp $125,$242,$205
+# CHECK: encoding: [0x64,0x7d,0xf2,0xcd]
+# CHECK-DISASS: 64 7d f2 cd     csp $125,$242,$205
+  csp $125,$242,$205
+
+# CHECK-INST: csp $225,$159,0x69
+# CHECK: encoding: [0x65,0xe1,0x9f,0x69]
+# CHECK-DISASS: 65 e1 9f 69     csp $225,$159,0x69
+  csp $225,$159,0x69
+
+# CHECK-INST: csod $44,$46,$72
+# CHECK: encoding: [0x66,0x2c,0x2e,0x48]
+# CHECK-DISASS: 66 2c 2e 48     csod $44,$46,$72
+  csod $44,$46,$72
+
+# CHECK-INST: csod $248,$124,0xb8
+# CHECK: encoding: [0x67,0xf8,0x7c,0xb8]
+# CHECK-DISASS: 67 f8 7c b8     csod $248,$124,0xb8
+  csod $248,$124,0xb8
+
+# CHECK-INST: csnn $190,$13,$46
+# CHECK: encoding: [0x68,0xbe,0x0d,0x2e]
+# CHECK-DISASS: 68 be 0d 2e     csnn $190,$13,$46
+  csnn $190,$13,$46
+
+# CHECK-INST: csnn $68,$99,0x33
+# CHECK: encoding: [0x69,0x44,0x63,0x33]
+# CHECK-DISASS: 69 44 63 33     csnn $68,$99,0x33
+  csnn $68,$99,0x33
+
+# CHECK-INST: csnz $39,$26,$169
+# CHECK: encoding: [0x6a,0x27,0x1a,0xa9]
+# CHECK-DISASS: 6a 27 1a a9     csnz $39,$26,$169
+  csnz $39,$26,$169
+
+# CHECK-INST: csnz $171,$158,0xf1
+# CHECK: encoding: [0x6b,0xab,0x9e,0xf1]
+# CHECK-DISASS: 6b ab 9e f1     csnz $171,$158,0xf1
+  csnz $171,$158,0xf1
+
+# CHECK-INST: csnp $220,$28,$185
+# CHECK: encoding: [0x6c,0xdc,0x1c,0xb9]
+# CHECK-DISASS: 6c dc 1c b9     csnp $220,$28,$185
+  csnp $220,$28,$185
+
+# CHECK-INST: csnp $143,$210,0xfe
+# CHECK: encoding: [0x6d,0x8f,0xd2,0xfe]
+# CHECK-DISASS: 6d 8f d2 fe     csnp $143,$210,0xfe
+  csnp $143,$210,0xfe
+
+# CHECK-INST: csev $21,$241,$100
+# CHECK: encoding: [0x6e,0x15,0xf1,0x64]
+# CHECK-DISASS: 6e 15 f1 64     csev $21,$241,$100
+  csev $21,$241,$100
+
+# CHECK-INST: csev $191,$144,0x7d
+# CHECK: encoding: [0x6f,0xbf,0x90,0x7d]
+# CHECK-DISASS: 6f bf 90 7d     csev $191,$144,0x7d
+  csev $191,$144,0x7d
+
+# CHECK-INST: zsn $205,$198,$223
+# CHECK: encoding: [0x70,0xcd,0xc6,0xdf]
+# CHECK-DISASS: 70 cd c6 df     zsn $205,$198,$223
+  zsn $205,$198,$223
+
+# CHECK-INST: zsn $131,$174,0x91
+# CHECK: encoding: [0x71,0x83,0xae,0x91]
+# CHECK-DISASS: 71 83 ae 91     zsn $131,$174,0x91
+  zsn $131,$174,0x91
+
+# CHECK-INST: zsz $39,$143,$41
+# CHECK: encoding: [0x72,0x27,0x8f,0x29]
+# CHECK-DISASS: 72 27 8f 29     zsz $39,$143,$41
+  zsz $39,$143,$41
+
+# CHECK-INST: zsz $128,$59,0x7c
+# CHECK: encoding: [0x73,0x80,0x3b,0x7c]
+# CHECK-DISASS: 73 80 3b 7c     zsz $128,$59,0x7c
+  zsz $128,$59,0x7c
+
+# CHECK-INST: zsp $122,$246,$115
+# CHECK: encoding: [0x74,0x7a,0xf6,0x73]
+# CHECK-DISASS: 74 7a f6 73     zsp $122,$246,$115
+  zsp $122,$246,$115
+
+# CHECK-INST: zsp $152,$184,0x20
+# CHECK: encoding: [0x75,0x98,0xb8,0x20]
+# CHECK-DISASS: 75 98 b8 20     zsp $152,$184,0x20
+  zsp $152,$184,0x20
+
+# CHECK-INST: zsod $208,$7,$165
+# CHECK: encoding: [0x76,0xd0,0x07,0xa5]
+# CHECK-DISASS: 76 d0 07 a5     zsod $208,$7,$165
+  zsod $208,$7,$165
+
+# CHECK-INST: zsod $50,$116,0x80
+# CHECK: encoding: [0x77,0x32,0x74,0x80]
+# CHECK-DISASS: 77 32 74 80     zsod $50,$116,0x80
+  zsod $50,$116,0x80
+
+# CHECK-INST: zsnn $130,$30,$27
+# CHECK: encoding: [0x78,0x82,0x1e,0x1b]
+# CHECK-DISASS: 78 82 1e 1b     zsnn $130,$30,$27
+  zsnn $130,$30,$27
+
+# CHECK-INST: zsnn $136,$85,0x60
+# CHECK: encoding: [0x79,0x88,0x55,0x60]
+# CHECK-DISASS: 79 88 55 60     zsnn $136,$85,0x60
+  zsnn $136,$85,0x60
+
+# CHECK-INST: zsnz $206,$233,$37
+# CHECK: encoding: [0x7a,0xce,0xe9,0x25]
+# CHECK-DISASS: 7a ce e9 25     zsnz $206,$233,$37
+  zsnz $206,$233,$37
+
+# CHECK-INST: zsnz $65,$3,0xdb
+# CHECK: encoding: [0x7b,0x41,0x03,0xdb]
+# CHECK-DISASS: 7b 41 03 db     zsnz $65,$3,0xdb
+  zsnz $65,$3,0xdb
+
+# CHECK-INST: zsnp $117,$19,$90
+# CHECK: encoding: [0x7c,0x75,0x13,0x5a]
+# CHECK-DISASS: 7c 75 13 5a     zsnp $117,$19,$90
+  zsnp $117,$19,$90
+
+# CHECK-INST: zsnp $211,$180,0x7b
+# CHECK: encoding: [0x7d,0xd3,0xb4,0x7b]
+# CHECK-DISASS: 7d d3 b4 7b     zsnp $211,$180,0x7b
+  zsnp $211,$180,0x7b
+
+# CHECK-INST: zsev $102,$15,$172
+# CHECK: encoding: [0x7e,0x66,0x0f,0xac]
+# CHECK-DISASS: 7e 66 0f ac     zsev $102,$15,$172
+  zsev $102,$15,$172
+
+# CHECK-INST: zsev $141,$201,0xb7
+# CHECK: encoding: [0x7f,0x8d,0xc9,0xb7]
+# CHECK-DISASS: 7f 8d c9 b7     zsev $141,$201,0xb7
+  zsev $141,$201,0xb7
+
 # CHECK-INST: or $66,$142,$150
 # CHECK: encoding: [0xc0,0x42,0x8e,0x96]
 # CHECK-DISASS: c0 42 8e 96     or $66,$142,$150
