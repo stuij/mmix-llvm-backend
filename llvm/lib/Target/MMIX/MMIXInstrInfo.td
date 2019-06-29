@@ -26,7 +26,6 @@ def SDT_MMIXCallSeqStart : SDCallSeqStart<[SDTCisVT<0, i64>,
 def SDT_MMIXCallSeqEnd   : SDCallSeqEnd<[SDTCisVT<0, i64>,
                                          SDTCisVT<1, i64>]>;
 
-
 def Call         : SDNode<"MMIXISD::CALL", SDT_MMIXCall,
                           [SDNPHasChain, SDNPOptInGlue, SDNPOutGlue,
                            SDNPVariadic]>;
@@ -156,8 +155,37 @@ defm NXOR   : ALU3multi<0xce, "nxor">;
 class ALU2op<bits<8> opcode, string opname>
     : MMIX2op<opcode, (outs GPR:$x), (ins uimm16:$yz), opname>;
 
+/// set instructions
+// conditional set
+let Constraints = "$F = $x" in
+class CONDSET3op<bits<8> opcode, dag ins, string opname>
+    : MMIX3op<opcode, (outs GPR:$x), ins, opname> {
+}
 
-/// 'Wyde' instructions get their own parent class because of label operand
+multiclass CONDSET3multi<bits<8> opcode, string opname> {
+  def _R : CONDSET3op<opcode, (ins GPR:$y, GPR:$z, GPR:$F), opname>;
+  def _I : CONDSET3op<!add(opcode, 1), (ins GPR:$y, uimm8:$z, GPR:$F), opname>;
+}
+
+defm CSN  : CONDSET3multi<0x60, "csn">;
+defm CSZ  : CONDSET3multi<0x62, "csz">;
+defm CSP  : CONDSET3multi<0x64, "csp">;
+defm CSOD : CONDSET3multi<0x66, "csod">;
+defm CSNN : CONDSET3multi<0x68, "csnn">;
+defm CSNZ : CONDSET3multi<0x6a, "csnz">;
+defm CSNP : CONDSET3multi<0x6c, "csnp">;
+defm CSEV : CONDSET3multi<0x6e, "csev">;
+
+defm ZSN  : CONDSET3multi<0x70, "zsn">;
+defm ZSZ  : CONDSET3multi<0x72, "zsz">;
+defm ZSP  : CONDSET3multi<0x74, "zsp">;
+defm ZSOD : CONDSET3multi<0x76, "zsod">;
+defm ZSNN : CONDSET3multi<0x78, "zsnn">;
+defm ZSNZ : CONDSET3multi<0x7a, "zsnz">;
+defm ZSNP : CONDSET3multi<0x7c, "zsnp">;
+defm ZSEV : CONDSET3multi<0x7e, "zsev">;
+
+// 'Wyde' instructions get their own parent class because of label operand
 class Wyde2op<bits<8> opcode, string opname, dag ins>
     : MMIX2op<opcode, (outs GPR:$x), ins, opname>;
 
@@ -292,6 +320,38 @@ multiclass AluPat<PatFrag AluOp, string op> {
 defm : AluPat<add, "ADD">;
 defm : AluPat<sub, "SUB">;
 defm : AluPat<and, "AND">;
+
+/// setcc/selectcc
+class SelectPat<PatFrag CondOp, CONDSET3op CondInst, ALU3op CmpInst>
+    : Pat<(select (i64 (CondOp GPR:$lhs, GPR:$rhs)), GPR:$T, GPR:$F),
+          (CondInst (CmpInst GPR:$lhs, GPR:$rhs), GPR:$T, GPR:$F)>;
+
+def : SelectPat<seteq, CSZ_R,  CMP_R>;
+def : SelectPat<setgt, CSP_R,  CMP_R>;
+def : SelectPat<setge, CSNN_R, CMP_R>;
+def : SelectPat<setlt, CSN_R,  CMP_R>;
+def : SelectPat<setle, CSNP_R, CMP_R>;
+def : SelectPat<setne, CSNZ_R, CMP_R>;
+
+def : SelectPat<setueq, CSZ_R,  CMPU_R>;
+def : SelectPat<setugt, CSP_R,  CMPU_R>;
+def : SelectPat<setuge, CSNN_R, CMPU_R>;
+def : SelectPat<setult, CSN_R,  CMPU_R>;
+def : SelectPat<setule, CSNP_R, CMPU_R>;
+def : SelectPat<setune, CSNZ_R, CMPU_R>;
+
+
+def : Pat<(select GPR:$cond, GPR:$T, GPR:$F),
+          (CSP_R  GPR:$cond, GPR:$T, GPR:$F)>;
+
+def : Pat<(select (i64 (seteq GPR:$lhs, 0)), GPR:$T, GPR:$F),
+          (CSZ_R  GPR:$lhs, GPR:$T, GPR:$F)>;
+def : Pat<(select (i64 (setne GPR:$lhs, 0)), GPR:$T, GPR:$F),
+          (CSNZ_R GPR:$lhs, GPR:$T, GPR:$F)>;
+
+def : Pat<(seteq GPR:$lhs, GPR:$rhs),
+          (CMP_R GPR:$lhs, GPR:$rhs)>;
+
 
 /// Branches, jumps and returns
 
