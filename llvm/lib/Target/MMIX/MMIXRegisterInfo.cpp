@@ -52,34 +52,78 @@ const uint32_t *MMIXRegisterInfo::getNoPreservedMask() const {
   return CSR_NoRegs_RegMask;
 }
 
+
+static unsigned getRegOpForImmOpVariant(unsigned Opcode) {
+  switch (Opcode) {
+  // loads
+  case MMIX::LDB_I:
+    return MMIX::LDB_R;
+  case MMIX::LDBU_I:
+    return MMIX::LDBU_R;
+  case MMIX::LDW_I:
+    return MMIX::LDW_R;
+  case MMIX::LDWU_I:
+    return MMIX::LDWU_R;
+  case MMIX::LDT_I:
+    return MMIX::LDT_R;
+  case MMIX::LDTU_I:
+    return MMIX::LDTU_R;
+  case MMIX::LDO_I:
+    return MMIX::LDO_R;
+  // stores
+  case MMIX::STB_I:
+    return MMIX::STB_R;
+  case MMIX::STW_I:
+    return MMIX::STW_R;
+  case MMIX::STT_I:
+    return MMIX::STT_R;
+  case MMIX::STO_I:
+    return MMIX::STO_R;
+  case MMIX::ADD_I:
+    return MMIX::ADD_R;
+  default:
+    llvm_unreachable("Invalid opcode");
+  }
+}
+
 void MMIXRegisterInfo::eliminateFrameIndex(MachineBasicBlock::iterator II,
                                            int SPAdj, unsigned FIOperandNum,
                                            RegScavenger *RS) const {
-  // TODO: this implementation is a temporary placeholder which does just
-  // enough to allow other aspects of code generation to be tested
-
   assert(SPAdj == 0 && "Unexpected non-zero SPAdj value");
 
   MachineInstr &MI = *II;
   MachineFunction &MF = *MI.getParent()->getParent();
-  const TargetFrameLowering *TFI = MF.getSubtarget().getFrameLowering();
+  MachineRegisterInfo &MRI = MF.getRegInfo();
+  const TargetInstrInfo *TII = MF.getSubtarget().getInstrInfo();
   DebugLoc DL = MI.getDebugLoc();
 
-  unsigned FrameReg = getFrameRegister(MF);
   int FrameIndex = MI.getOperand(FIOperandNum).getIndex();
-  int Offset = TFI->getFrameIndexReference(MF, FrameIndex, FrameReg);
-  Offset += MI.getOperand(FIOperandNum + 1).getImm();
+  unsigned FrameReg;
+  int Offset =
+      getFrameLowering(MF)->getFrameIndexReference(MF, FrameIndex, FrameReg) +
+      MI.getOperand(FIOperandNum + 1).getImm();
 
-  assert(TFI->hasFP(MF) && "eliminateFrameIndex currently requires hasFP");
+  assert(MF.getSubtarget().getFrameLowering()->hasFP(MF) &&
+         "eliminateFrameIndex currently requires hasFP");
 
-  // Offsets must be directly encoded in a 16-bit immediate field
-  if (Offset < -262144 || Offset > 262140) {
-    report_fatal_error(
-        "Frame offsets outside of -262144 - 262140 range not supported");
+  if (MI.getOpcode() == MMIX::ADD_I && Offset < 0 && isInt<8>(Offset)) {
+    MI.setDesc(TII->get(MMIX::SUB_I));
+    MI.getOperand(FIOperandNum + 1).ChangeToImmediate(-Offset);
+  } else if (Offset < 0) {
+    MI.setDesc(TII->get(getRegOpForImmOpVariant(MI.getOpcode())));
+    unsigned Reg = MRI.createVirtualRegister(&MMIX::GPRRegClass);
+
+    BuildMI(*MI.getParent(), II, DL, TII->get(MMIX::LDI), Reg)
+        .addImm(Offset);
+
+    MI.getOperand(FIOperandNum + 1)
+        .ChangeToRegister(Reg, /*isDef=*/false, /*isImp=*/false,
+                          /*isKill=*/true);
+  } else {
+    MI.getOperand(FIOperandNum + 1).ChangeToImmediate(Offset);
   }
 
   MI.getOperand(FIOperandNum).ChangeToRegister(FrameReg, false);
-  MI.getOperand(FIOperandNum + 1).ChangeToImmediate(Offset);
 }
 
 Register MMIXRegisterInfo::getFrameRegister(const MachineFunction &MF) const {
