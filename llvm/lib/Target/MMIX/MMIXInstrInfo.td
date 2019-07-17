@@ -47,7 +47,7 @@ class UImmAsmOperand<int width>
   let DiagnosticType = !strconcat("Invalid", Name);
 }
 
-def uimm8 : Operand<i64>, ImmLeaf<i64, [{return isUInt<8>(Imm);}]> {
+def uimm8 : Operand<i64>, ImmLeaf<i64, [{return isUInt<8>(Imm) && Imm > 0;}]> {
   let ParserMatchClass = UImmAsmOperand<8>;
   let DecoderMethod = "decodeUImmOperand<8>";
 }
@@ -392,12 +392,34 @@ def PseudoRET : Pseudo<(outs), (ins), [(RetFlag)]>,
                 PseudoInstExpansion<(POP 0, 0)>;
 
 
+/// Addressing modes.
+// Necessary because a frameindex can't be matched directly in a pattern.
+def AddrFI : ComplexPattern<iPTR, 1, "SelectAddrFI", [frameindex], []>;
+
+/// Predicates
+def IsOrAdd: PatFrag<(ops node:$A, node:$B), (or node:$A, node:$B), [{
+  return isOrEquivalentToAdd(N);
+}]>;
+
+
+/// FrameIndex calculations
+def : Pat<(add (i64 AddrFI:$y), uimm8:$z),
+          (ADD_I (i64 AddrFI:$y), uimm8:$z)>;
+def : Pat<(IsOrAdd (i64 AddrFI:$y), uimm8:$z),
+          (ADD_I (i64 AddrFI:$y), uimm8:$z)>;
+
+
 /// load and store
 // signed and unsigned extended loads
 multiclass LdPat<PatFrag LoadOp, LD3op Inst> {
   def : Pat<(LoadOp GPR:$y), (Inst GPR:$y, 0)>;
   def : Pat<(LoadOp (add GPR:$y, uimm8:$z)),
             (Inst GPR:$y, uimm8:$z)>;
+  def : Pat<(LoadOp (add AddrFI:$y, uimm8:$z)),
+            (Inst AddrFI:$y, uimm8:$z)>;
+  def : Pat<(LoadOp (IsOrAdd AddrFI:$y, uimm8:$z)),
+            (Inst AddrFI:$y, uimm8:$z)>;
+  def : Pat<(LoadOp AddrFI:$y), (Inst AddrFI:$y, 0)>;
 }
 
 // load i8
@@ -415,11 +437,17 @@ defm : LdPat<zextloadi32, LDTU_I>;
 // load i64
 defm : LdPat<load, LDO_I>;
 
+
 // store
 multiclass StPat<PatFrag StoreOp, ST3op Inst> {
   def : Pat<(StoreOp GPR:$x, GPR:$y), (Inst GPR:$x, GPR:$y, 0)>;
   def : Pat<(StoreOp GPR:$x, (add GPR:$y, uimm8:$z)),
             (Inst GPR:$x, GPR:$y, uimm8:$z)>;
+  def : Pat<(StoreOp GPR:$x, AddrFI:$y), (Inst GPR:$x, AddrFI:$y, 0)>;
+  def : Pat<(StoreOp GPR:$x, (add AddrFI:$y, uimm8:$z)),
+            (Inst GPR:$x, AddrFI:$y, uimm8:$z)>;
+  def : Pat<(StoreOp GPR:$x, (IsOrAdd AddrFI:$y, uimm8:$z)),
+            (Inst GPR:$x, AddrFI:$y, uimm8:$z)>;
 }
 
 defm : StPat<truncstorei8, STB_I>;
