@@ -141,6 +141,11 @@ defm ADDU16 : ALU3multi<0x2e, "addu16">;
 defm CMP    : ALU3multi<0x30, "cmp">;
 defm CMPU   : ALU3multi<0x32, "cmpu">;
 
+def NEG_R : ALU3op<0x34, (ins uimm8:$y, GPR:$z), "neg">;
+def NEG_I : ALU3op<0x35, (ins uimm8:$y, uimm8:$z), "neg">;
+def NEGU_R : ALU3op<0x36, (ins uimm8:$y, GPR:$z), "negu">;
+def NEGU_I : ALU3op<0x37, (ins uimm8:$y, uimm8:$z), "negu">;
+
 defm OR     : ALU3multi<0xc0, "or">;
 defm ORN    : ALU3multi<0xc2, "orn">;
 defm NOR    : ALU3multi<0xc4, "nor">;

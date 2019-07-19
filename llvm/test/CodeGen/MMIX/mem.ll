@@ -141,10 +141,10 @@ define i64 @load_medium_range(i8 *%a) nounwind {
 define i64 @load_long_range(i8 *%a) nounwind {
 ; CHECK-LABEL: load_long_range:
 ; CHECK:       % %bb.0:
-; CHECK-NEXT:    seth $16,0x8899
-; CHECK-NEXT:    ormh $16,0xaabb
+; CHECK-NEXT:    setl $16,0xeeff
 ; CHECK-NEXT:    orml $16,0xccdd
-; CHECK-NEXT:    orl $16,0xeeff
+; CHECK-NEXT:    ormh $16,0xaabb
+; CHECK-NEXT:    orh $16,0x8899
 ; CHECK-NEXT:    add $16,$231,$16
 ; CHECK-NEXT:    ldb $231,$16,0x0
 ; CHECK-NEXT:    pop 0x0,0x0

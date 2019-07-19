@@ -100,20 +100,56 @@ void MMIXInstrInfo::expandLDImm(MachineBasicBlock::iterator MI) const {
   DebugLoc DL = MI->getDebugLoc();
   MachineBasicBlock *MBB = MI->getParent();
 
-  uint64_t imm = MI->getOperand(1).getImm();
-  BuildMI(*MBB, MI, DL, get(MMIX::SETH))
-      .add(MI->getOperand(0))
-      .addImm(imm >> 48);
-  BuildMI(*MBB, MI, DL, get(MMIX::ORMH))
-      .add(MI->getOperand(0))
-      .addImm((imm >> 32) & 0xffff);
-  BuildMI(*MBB, MI, DL, get(MMIX::ORML))
-      .add(MI->getOperand(0))
-      .addImm((imm >> 16) & 0xffff);
-  BuildMI(*MBB, MI, DL, get(MMIX::ORL))
-      .add(MI->getOperand(0))
-      .addImm(imm & 0xffff);
+  int64_t imm = MI->getOperand(1).getImm();
+  uint64_t uimm = MI->getOperand(1).getImm();
 
+  if (imm >= 0 || (-imm >> 32)) {
+    BuildMI(*MBB, MI, DL, get(MMIX::SETL))
+        .add(MI->getOperand(0))
+        .addImm(uimm & 0xffff);
+
+    if (uimm >> 16) {
+      BuildMI(*MBB, MI, DL, get(MMIX::ORML))
+          .add(MI->getOperand(0))
+          .addImm((uimm >> 16) & 0xffff);
+    }
+    if (uimm >> 32) {
+      BuildMI(*MBB, MI, DL, get(MMIX::ORMH))
+          .add(MI->getOperand(0))
+          .addImm((uimm >> 32) & 0xffff);
+    }
+    if (uimm >> 48) {
+      BuildMI(*MBB, MI, DL, get(MMIX::ORH))
+          .add(MI->getOperand(0))
+          .addImm(uimm >> 48);
+    }
+
+  } else {
+    imm = -imm;
+
+    if (!(imm >> 8)) {
+      BuildMI(*MBB, MI, DL, get(MMIX::NEG_I))
+          .add(MI->getOperand(0))
+          .addImm(0)
+          .addImm(imm);
+
+    } else {
+      BuildMI(*MBB, MI, DL, get(MMIX::SETL))
+          .add(MI->getOperand(0))
+          .addImm(imm & 0xffff);
+
+      if (imm >> 16) {
+        BuildMI(*MBB, MI, DL, get(MMIX::ORML))
+            .add(MI->getOperand(0))
+            .addImm((imm >> 16) & 0xffff);
+      }
+
+      BuildMI(*MBB, MI, DL, get(MMIX::NEG_R))
+          .add(MI->getOperand(0))
+          .addImm(0)
+          .addReg(MI->getOperand(0).getReg());
+    }
+  }
   MBB->erase(MI);
 }
 

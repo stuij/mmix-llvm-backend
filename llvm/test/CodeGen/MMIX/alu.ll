@@ -34,10 +34,7 @@ define i64 @sub(i64 %a, i64 %b) nounwind {
 define i64 @subi(i64 %a) nounwind {
 ; CHECK-LABEL: subi:
 ; CHECK:       % %bb.0:
-; CHECK-NEXT:    seth $16,0xffff
-; CHECK-NEXT:    ormh $16,0xffff
-; CHECK-NEXT:    orml $16,0xffff
-; CHECK-NEXT:    orl $16,0xff01
+; CHECK-NEXT:    neg $16,0x0,0xff
 ; CHECK-NEXT:    add $231,$231,$16
 ; CHECK-NEXT:    pop 0x0,0x0
   %1 = sub i64 %a, 255
