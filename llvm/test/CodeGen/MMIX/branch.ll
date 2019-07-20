@@ -4,6 +4,9 @@
 define void @foo(i64 %a, i64 *%b, i1 %c) {
 ; CHECK-LABEL: foo:
 ; CHECK:       % %bb.0:
+; CHECK-NEXT:    sub $254,$254,0x10
+; CHECK-NEXT:    sto $253,$254,0x8
+; CHECK-NEXT:    add $253,$254,0x10
 ; CHECK-NEXT:    ldo $16,$232,0x0
 ; CHECK-NEXT:    cmp $16,$16,$231
 ; CHECK-NEXT:    bz $16,.LBB0_12
@@ -61,6 +64,8 @@ define void @foo(i64 %a, i64 *%b, i1 %c) {
 ; CHECK-NEXT:  .LBB0_11: % %test12
 ; CHECK-NEXT:    ldo $16,$232,0x0
 ; CHECK-NEXT:  .LBB0_12: % %end
+; CHECK-NEXT:    ldo $253,$254,0x8
+; CHECK-NEXT:    add $254,$254,0x10
 ; CHECK-NEXT:    pop 0x0,0x0
   %val1 = load volatile i64, i64* %b
   %tst1 = icmp eq i64 %val1, %a

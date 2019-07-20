@@ -4,7 +4,12 @@
 define i64 @zero() nounwind {
 ; CHECK-LABEL: zero:
 ; CHECK:       % %bb.0:
+; CHECK-NEXT:    sub $254,$254,0x10
+; CHECK-NEXT:    sto $253,$254,0x8
+; CHECK-NEXT:    add $253,$254,0x10
 ; CHECK-NEXT:    setl $231,0x0
+; CHECK-NEXT:    ldo $253,$254,0x8
+; CHECK-NEXT:    add $254,$254,0x10
 ; CHECK-NEXT:    pop 0x0,0x0
   ret i64 0
 }
@@ -12,7 +17,12 @@ define i64 @zero() nounwind {
 define i64 @neg_i8() nounwind {
 ; CHECK-LABEL: neg_i8:
 ; CHECK:       % %bb.0:
+; CHECK-NEXT:    sub $254,$254,0x10
+; CHECK-NEXT:    sto $253,$254,0x8
+; CHECK-NEXT:    add $253,$254,0x10
 ; CHECK-NEXT:    neg $231,0x0,0x1
+; CHECK-NEXT:    ldo $253,$254,0x8
+; CHECK-NEXT:    add $254,$254,0x10
 ; CHECK-NEXT:    pop 0x0,0x0
   ret i64 -1
 }
@@ -20,7 +30,12 @@ define i64 @neg_i8() nounwind {
 define i64 @pos_i16() nounwind {
 ; CHECK-LABEL: pos_i16:
 ; CHECK:       % %bb.0:
+; CHECK-NEXT:    sub $254,$254,0x10
+; CHECK-NEXT:    sto $253,$254,0x8
+; CHECK-NEXT:    add $253,$254,0x10
 ; CHECK-NEXT:    setl $231,0xffff
+; CHECK-NEXT:    ldo $253,$254,0x8
+; CHECK-NEXT:    add $254,$254,0x10
 ; CHECK-NEXT:    pop 0x0,0x0
   ret i64 65535
 }
@@ -28,8 +43,13 @@ define i64 @pos_i16() nounwind {
 define i64 @neg_i16() nounwind {
 ; CHECK-LABEL: neg_i16:
 ; CHECK:       % %bb.0:
+; CHECK-NEXT:    sub $254,$254,0x10
+; CHECK-NEXT:    sto $253,$254,0x8
+; CHECK-NEXT:    add $253,$254,0x10
 ; CHECK-NEXT:    setl $231,0xffff
 ; CHECK-NEXT:    neg $231,0x0,$231
+; CHECK-NEXT:    ldo $253,$254,0x8
+; CHECK-NEXT:    add $254,$254,0x10
 ; CHECK-NEXT:    pop 0x0,0x0
   ret i64 -65535
 }
@@ -37,8 +57,13 @@ define i64 @neg_i16() nounwind {
 define i64 @pos_i32() nounwind {
 ; CHECK-LABEL: pos_i32:
 ; CHECK:       % %bb.0:
+; CHECK-NEXT:    sub $254,$254,0x10
+; CHECK-NEXT:    sto $253,$254,0x8
+; CHECK-NEXT:    add $253,$254,0x10
 ; CHECK-NEXT:    setl $231,0x0
 ; CHECK-NEXT:    orml $231,0x1
+; CHECK-NEXT:    ldo $253,$254,0x8
+; CHECK-NEXT:    add $254,$254,0x10
 ; CHECK-NEXT:    pop 0x0,0x0
   ret i64 65536
 }
@@ -46,9 +71,14 @@ define i64 @pos_i32() nounwind {
 define i64 @neg_i32() nounwind {
 ; CHECK-LABEL: neg_i32:
 ; CHECK:       % %bb.0:
+; CHECK-NEXT:    sub $254,$254,0x10
+; CHECK-NEXT:    sto $253,$254,0x8
+; CHECK-NEXT:    add $253,$254,0x10
 ; CHECK-NEXT:    setl $231,0x0
 ; CHECK-NEXT:    orml $231,0x1
 ; CHECK-NEXT:    neg $231,0x0,$231
+; CHECK-NEXT:    ldo $253,$254,0x8
+; CHECK-NEXT:    add $254,$254,0x10
 ; CHECK-NEXT:    pop 0x0,0x0
   ret i64 -65536
 }
@@ -56,10 +86,15 @@ define i64 @neg_i32() nounwind {
 define i64 @pos_i64() nounwind {
 ; CHECK-LABEL: pos_i64:
 ; CHECK:       % %bb.0:
+; CHECK-NEXT:    sub $254,$254,0x10
+; CHECK-NEXT:    sto $253,$254,0x8
+; CHECK-NEXT:    add $253,$254,0x10
 ; CHECK-NEXT:    setl $231,0xeeff
 ; CHECK-NEXT:    orml $231,0xccdd
 ; CHECK-NEXT:    ormh $231,0xaabb
 ; CHECK-NEXT:    orh $231,0x8899
+; CHECK-NEXT:    ldo $253,$254,0x8
+; CHECK-NEXT:    add $254,$254,0x10
 ; CHECK-NEXT:    pop 0x0,0x0
   ret i64 9843086184167632639
 }
@@ -67,10 +102,15 @@ define i64 @pos_i64() nounwind {
 define i64 @neg_i64() nounwind {
 ; CHECK-LABEL: neg_i64:
 ; CHECK:       % %bb.0:
+; CHECK-NEXT:    sub $254,$254,0x10
+; CHECK-NEXT:    sto $253,$254,0x8
+; CHECK-NEXT:    add $253,$254,0x10
 ; CHECK-NEXT:    setl $231,0x3210
 ; CHECK-NEXT:    orml $231,0x7654
 ; CHECK-NEXT:    ormh $231,0xba98
 ; CHECK-NEXT:    orh $231,0xfedc
+; CHECK-NEXT:    ldo $253,$254,0x8
+; CHECK-NEXT:    add $254,$254,0x10
 ; CHECK-NEXT:    pop 0x0,0x0
   ret i64  -81985529216486896
 }

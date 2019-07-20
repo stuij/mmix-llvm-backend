@@ -6,7 +6,12 @@
 define i64 @add(i64 %a, i64 %b) nounwind {
 ; CHECK-LABEL: add:
 ; CHECK:       % %bb.0:
+; CHECK-NEXT:    sub $254,$254,0x10
+; CHECK-NEXT:    sto $253,$254,0x8
+; CHECK-NEXT:    add $253,$254,0x10
 ; CHECK-NEXT:    add $231,$231,$232
+; CHECK-NEXT:    ldo $253,$254,0x8
+; CHECK-NEXT:    add $254,$254,0x10
 ; CHECK-NEXT:    pop 0x0,0x0
   %1 = add i64 %a, %b
   ret i64 %1
@@ -15,7 +20,12 @@ define i64 @add(i64 %a, i64 %b) nounwind {
 define i64 @addi(i64 %a) nounwind {
 ; CHECK-LABEL: addi:
 ; CHECK:       % %bb.0:
+; CHECK-NEXT:    sub $254,$254,0x10
+; CHECK-NEXT:    sto $253,$254,0x8
+; CHECK-NEXT:    add $253,$254,0x10
 ; CHECK-NEXT:    add $231,$231,0x1
+; CHECK-NEXT:    ldo $253,$254,0x8
+; CHECK-NEXT:    add $254,$254,0x10
 ; CHECK-NEXT:    pop 0x0,0x0
   %1 = add i64 %a, 1
   ret i64 %1
@@ -24,7 +34,12 @@ define i64 @addi(i64 %a) nounwind {
 define i64 @sub(i64 %a, i64 %b) nounwind {
 ; CHECK-LABEL: sub:
 ; CHECK:       % %bb.0:
+; CHECK-NEXT:    sub $254,$254,0x10
+; CHECK-NEXT:    sto $253,$254,0x8
+; CHECK-NEXT:    add $253,$254,0x10
 ; CHECK-NEXT:    sub $231,$231,$232
+; CHECK-NEXT:    ldo $253,$254,0x8
+; CHECK-NEXT:    add $254,$254,0x10
 ; CHECK-NEXT:    pop 0x0,0x0
   %1 = sub i64 %a, %b
   ret i64 %1
@@ -34,8 +49,13 @@ define i64 @sub(i64 %a, i64 %b) nounwind {
 define i64 @subi(i64 %a) nounwind {
 ; CHECK-LABEL: subi:
 ; CHECK:       % %bb.0:
+; CHECK-NEXT:    sub $254,$254,0x10
+; CHECK-NEXT:    sto $253,$254,0x8
+; CHECK-NEXT:    add $253,$254,0x10
 ; CHECK-NEXT:    neg $16,0x0,0xff
 ; CHECK-NEXT:    add $231,$231,$16
+; CHECK-NEXT:    ldo $253,$254,0x8
+; CHECK-NEXT:    add $254,$254,0x10
 ; CHECK-NEXT:    pop 0x0,0x0
   %1 = sub i64 %a, 255
   ret i64 %1
