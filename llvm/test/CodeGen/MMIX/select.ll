@@ -4,9 +4,14 @@
 define i64 @bare_select(i1 %a, i64 %b, i64 %c) {
 ; CHECK-LABEL: bare_select:
 ; CHECK:       % %bb.0:
+; CHECK-NEXT:    sub $254,$254,0x10
+; CHECK-NEXT:    sto $253,$254,0x8
+; CHECK-NEXT:    add $253,$254,0x10
 ; CHECK-NEXT:    and $16,$231,0x1
 ; CHECK-NEXT:    csp $233,$16,$232
 ; CHECK-NEXT:    add $231,$233,0x0
+; CHECK-NEXT:    ldo $253,$254,0x8
+; CHECK-NEXT:    add $254,$254,0x10
 ; CHECK-NEXT:    pop 0x0,0x0
    %1 = select i1 %a, i64 %b, i64 %c
 
@@ -16,6 +21,9 @@ define i64 @bare_select(i1 %a, i64 %b, i64 %c) {
 define i64 @setcc_select(i64 %a, i64 *%b) {
 ; CHECK-LABEL: setcc_select:
 ; CHECK:       % %bb.0:
+; CHECK-NEXT:    sub $254,$254,0x10
+; CHECK-NEXT:    sto $253,$254,0x8
+; CHECK-NEXT:    add $253,$254,0x10
 ; CHECK-NEXT:    ldo $16,$232,0x0
 ; CHECK-NEXT:    cmp $17,$231,$16
 ; CHECK-NEXT:    csz $16,$17,$231
@@ -46,6 +54,8 @@ define i64 @setcc_select(i64 %a, i64 *%b) {
 ; CHECK-NEXT:    ldo $231,$232,0x0
 ; CHECK-NEXT:    cmp $17,$16,$231
 ; CHECK-NEXT:    csnp $231,$17,$16
+; CHECK-NEXT:    ldo $253,$254,0x8
+; CHECK-NEXT:    add $254,$254,0x10
 ; CHECK-NEXT:    pop 0x0,0x0
   %val1 = load volatile i64, i64* %b
   %tst1 = icmp eq i64 %a, %val1
@@ -93,9 +103,14 @@ define i64 @setcc_select(i64 %a, i64 *%b) {
 define i64 @select_eq_zero(i64 %a, i64 *%b) {
 ; CHECK-LABEL: select_eq_zero:
 ; CHECK:       % %bb.0:
+; CHECK-NEXT:    sub $254,$254,0x10
+; CHECK-NEXT:    sto $253,$254,0x8
+; CHECK-NEXT:    add $253,$254,0x10
 ; CHECK-NEXT:    ldo $16,$232,0x0
 ; CHECK-NEXT:    csz $16,$16,$231
 ; CHECK-NEXT:    add $231,$16,0x0
+; CHECK-NEXT:    ldo $253,$254,0x8
+; CHECK-NEXT:    add $254,$254,0x10
 ; CHECK-NEXT:    pop 0x0,0x0
   %val1 = load volatile i64, i64* %b
   %tst1 = icmp eq i64 %val1, 0
@@ -107,9 +122,14 @@ define i64 @select_eq_zero(i64 %a, i64 *%b) {
 define i64 @select_ne_zero(i64 %a, i64 *%b) {
 ; CHECK-LABEL: select_ne_zero:
 ; CHECK:       % %bb.0:
+; CHECK-NEXT:    sub $254,$254,0x10
+; CHECK-NEXT:    sto $253,$254,0x8
+; CHECK-NEXT:    add $253,$254,0x10
 ; CHECK-NEXT:    ldo $16,$232,0x0
 ; CHECK-NEXT:    csnz $16,$16,$231
 ; CHECK-NEXT:    add $231,$16,0x0
+; CHECK-NEXT:    ldo $253,$254,0x8
+; CHECK-NEXT:    add $254,$254,0x10
 ; CHECK-NEXT:    pop 0x0,0x0
   %val1 = load volatile i64, i64* %b
   %tst1 = icmp ne i64 %val1, 0

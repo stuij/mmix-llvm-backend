@@ -9,26 +9,31 @@
 define i32 @test() nounwind {
 ; CHECK-LABEL: test:
 ; CHECK:       % %bb.0:
+; CHECK-NEXT:    sub $254,$254,0x30
 ; CHECK-NEXT:    get $252,rJ
 ; CHECK-NEXT:    sto $252,$254,0x28
-; CHECK-NEXT:    sto $0,$254,0x20
+; CHECK-NEXT:    sto $253,$254,0x20
+; CHECK-NEXT:    sto $0,$254,0x18
+; CHECK-NEXT:    add $253,$254,0x30
 ; CHECK-NEXT:    setl $0,0x0
-; CHECK-NEXT:    neg $16,0x0,0x18
-; CHECK-NEXT:    stt $0,$253,$16
 ; CHECK-NEXT:    neg $16,0x0,0x20
-; CHECK-NEXT:    sto $0,$253,$16
+; CHECK-NEXT:    stt $0,$253,$16
 ; CHECK-NEXT:    neg $16,0x0,0x28
 ; CHECK-NEXT:    sto $0,$253,$16
-; CHECK-NEXT:    sub $231,$253,0x24
+; CHECK-NEXT:    neg $16,0x0,0x30
+; CHECK-NEXT:    sto $0,$253,$16
+; CHECK-NEXT:    sub $231,$253,0x2c
 ; CHECK-NEXT:    seth $16,test1
 ; CHECK-NEXT:    ormh $16,test1
 ; CHECK-NEXT:    orml $16,test1
 ; CHECK-NEXT:    orl $16,test1
 ; CHECK-NEXT:    pushgo $0,$16,0x0
 ; CHECK-NEXT:    add $231,$0,0x0
-; CHECK-NEXT:    ldo $0,$254,0x20
+; CHECK-NEXT:    ldo $0,$254,0x18
+; CHECK-NEXT:    ldo $253,$254,0x20
 ; CHECK-NEXT:    ldo $252,$254,0x28
 ; CHECK-NEXT:    put rJ,$252
+; CHECK-NEXT:    add $254,$254,0x30
 ; CHECK-NEXT:    pop 0x0,0x0
   %key = alloca %struct.key_t, align 4
   %1 = bitcast %struct.key_t* %key to i8*

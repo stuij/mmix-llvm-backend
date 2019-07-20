@@ -5,10 +5,15 @@
 define i64 @load_byte(i8 *%a) nounwind {
 ; CHECK-LABEL: load_byte:
 ; CHECK:       % %bb.0:
+; CHECK-NEXT:    sub $254,$254,0x10
+; CHECK-NEXT:    sto $253,$254,0x8
+; CHECK-NEXT:    add $253,$254,0x10
 ; CHECK-NEXT:    ldb $16,$231,0x0
 ; CHECK-NEXT:    ldbu $16,$231,0x2
 ; CHECK-NEXT:    ldb $17,$231,0x1
 ; CHECK-NEXT:    add $231,$17,$16
+; CHECK-NEXT:    ldo $253,$254,0x8
+; CHECK-NEXT:    add $254,$254,0x10
 ; CHECK-NEXT:    pop 0x0,0x0
   %1 = getelementptr i8, i8* %a, i64 1
   %2 = load i8, i8* %1
@@ -26,10 +31,15 @@ define i64 @load_byte(i8 *%a) nounwind {
 define i64 @load_wyde(i16 *%a) nounwind {
 ; CHECK-LABEL: load_wyde:
 ; CHECK:       % %bb.0:
+; CHECK-NEXT:    sub $254,$254,0x10
+; CHECK-NEXT:    sto $253,$254,0x8
+; CHECK-NEXT:    add $253,$254,0x10
 ; CHECK-NEXT:    ldw $16,$231,0x0
 ; CHECK-NEXT:    ldwu $16,$231,0x8
 ; CHECK-NEXT:    ldw $17,$231,0x4
 ; CHECK-NEXT:    add $231,$17,$16
+; CHECK-NEXT:    ldo $253,$254,0x8
+; CHECK-NEXT:    add $254,$254,0x10
 ; CHECK-NEXT:    pop 0x0,0x0
   %1 = getelementptr i16, i16* %a, i64 2
   %2 = load i16, i16* %1
@@ -46,10 +56,15 @@ define i64 @load_wyde(i16 *%a) nounwind {
 define i64 @load_tetra(i32 *%a) nounwind {
 ; CHECK-LABEL: load_tetra:
 ; CHECK:       % %bb.0:
+; CHECK-NEXT:    sub $254,$254,0x10
+; CHECK-NEXT:    sto $253,$254,0x8
+; CHECK-NEXT:    add $253,$254,0x10
 ; CHECK-NEXT:    ldt $16,$231,0x0
 ; CHECK-NEXT:    ldtu $16,$231,0x40
 ; CHECK-NEXT:    ldt $17,$231,0x20
 ; CHECK-NEXT:    add $231,$17,$16
+; CHECK-NEXT:    ldo $253,$254,0x8
+; CHECK-NEXT:    add $254,$254,0x10
 ; CHECK-NEXT:    pop 0x0,0x0
   %1 = getelementptr i32, i32* %a, i64 8
   %2 = load i32, i32* %1
@@ -66,7 +81,12 @@ define i64 @load_tetra(i32 *%a) nounwind {
 define i64 @load_octa(i64 *%a) nounwind {
 ; CHECK-LABEL: load_octa:
 ; CHECK:       % %bb.0:
+; CHECK-NEXT:    sub $254,$254,0x10
+; CHECK-NEXT:    sto $253,$254,0x8
+; CHECK-NEXT:    add $253,$254,0x10
 ; CHECK-NEXT:    ldo $231,$231,0xf8
+; CHECK-NEXT:    ldo $253,$254,0x8
+; CHECK-NEXT:    add $254,$254,0x10
 ; CHECK-NEXT:    pop 0x0,0x0
   %1 = getelementptr i64, i64* %a, i64 31
   %2 = load i64, i64* %1
@@ -78,8 +98,13 @@ define i64 @load_octa(i64 *%a) nounwind {
 define void @store_byte(i8 *%a, i8 %b) nounwind {
 ; CHECK-LABEL: store_byte:
 ; CHECK:       % %bb.0:
+; CHECK-NEXT:    sub $254,$254,0x10
+; CHECK-NEXT:    sto $253,$254,0x8
+; CHECK-NEXT:    add $253,$254,0x10
 ; CHECK-NEXT:    stb $232,$231,0x4
 ; CHECK-NEXT:    stb $232,$231,0x0
+; CHECK-NEXT:    ldo $253,$254,0x8
+; CHECK-NEXT:    add $254,$254,0x10
 ; CHECK-NEXT:    pop 0x0,0x0
   store i8 %b, i8* %a
   %1 = getelementptr i8, i8* %a, i64 4
@@ -90,8 +115,13 @@ define void @store_byte(i8 *%a, i8 %b) nounwind {
 define void @store_wyde(i16 *%a, i16 %b) nounwind {
 ; CHECK-LABEL: store_wyde:
 ; CHECK:       % %bb.0:
+; CHECK-NEXT:    sub $254,$254,0x10
+; CHECK-NEXT:    sto $253,$254,0x8
+; CHECK-NEXT:    add $253,$254,0x10
 ; CHECK-NEXT:    stw $232,$231,0x8
 ; CHECK-NEXT:    stw $232,$231,0x0
+; CHECK-NEXT:    ldo $253,$254,0x8
+; CHECK-NEXT:    add $254,$254,0x10
 ; CHECK-NEXT:    pop 0x0,0x0
   store i16 %b, i16* %a
   %1 = getelementptr i16, i16* %a, i64 4
@@ -102,8 +132,13 @@ define void @store_wyde(i16 *%a, i16 %b) nounwind {
 define void @store_tetra(i32 *%a, i32 %b) nounwind {
 ; CHECK-LABEL: store_tetra:
 ; CHECK:       % %bb.0:
+; CHECK-NEXT:    sub $254,$254,0x10
+; CHECK-NEXT:    sto $253,$254,0x8
+; CHECK-NEXT:    add $253,$254,0x10
 ; CHECK-NEXT:    stt $232,$231,0x10
 ; CHECK-NEXT:    stt $232,$231,0x0
+; CHECK-NEXT:    ldo $253,$254,0x8
+; CHECK-NEXT:    add $254,$254,0x10
 ; CHECK-NEXT:    pop 0x0,0x0
   store i32 %b, i32* %a
   %1 = getelementptr i32, i32* %a, i64 4
@@ -114,8 +149,13 @@ define void @store_tetra(i32 *%a, i32 %b) nounwind {
 define void @store_octa(i64 *%a, i64 %b) nounwind {
 ; CHECK-LABEL: store_octa:
 ; CHECK:       % %bb.0:
+; CHECK-NEXT:    sub $254,$254,0x10
+; CHECK-NEXT:    sto $253,$254,0x8
+; CHECK-NEXT:    add $253,$254,0x10
 ; CHECK-NEXT:    sto $232,$231,0x20
 ; CHECK-NEXT:    sto $232,$231,0x0
+; CHECK-NEXT:    ldo $253,$254,0x8
+; CHECK-NEXT:    add $254,$254,0x10
 ; CHECK-NEXT:    pop 0x0,0x0
   store i64 %b, i64* %a
   %1 = getelementptr i64, i64* %a, i64 4
@@ -128,9 +168,14 @@ define void @store_octa(i64 *%a, i64 %b) nounwind {
 define i64 @load_medium_range(i8 *%a) nounwind {
 ; CHECK-LABEL: load_medium_range:
 ; CHECK:       % %bb.0:
+; CHECK-NEXT:    sub $254,$254,0x10
+; CHECK-NEXT:    sto $253,$254,0x8
+; CHECK-NEXT:    add $253,$254,0x10
 ; CHECK-NEXT:    setl $16,0x100
 ; CHECK-NEXT:    add $16,$231,$16
 ; CHECK-NEXT:    ldb $231,$16,0x0
+; CHECK-NEXT:    ldo $253,$254,0x8
+; CHECK-NEXT:    add $254,$254,0x10
 ; CHECK-NEXT:    pop 0x0,0x0
   %1 = getelementptr i8, i8* %a, i64 256
   %2 = load i8, i8* %1
@@ -141,12 +186,17 @@ define i64 @load_medium_range(i8 *%a) nounwind {
 define i64 @load_long_range(i8 *%a) nounwind {
 ; CHECK-LABEL: load_long_range:
 ; CHECK:       % %bb.0:
+; CHECK-NEXT:    sub $254,$254,0x10
+; CHECK-NEXT:    sto $253,$254,0x8
+; CHECK-NEXT:    add $253,$254,0x10
 ; CHECK-NEXT:    setl $16,0xeeff
 ; CHECK-NEXT:    orml $16,0xccdd
 ; CHECK-NEXT:    ormh $16,0xaabb
 ; CHECK-NEXT:    orh $16,0x8899
 ; CHECK-NEXT:    add $16,$231,$16
 ; CHECK-NEXT:    ldb $231,$16,0x0
+; CHECK-NEXT:    ldo $253,$254,0x8
+; CHECK-NEXT:    add $254,$254,0x10
 ; CHECK-NEXT:    pop 0x0,0x0
   %1 = getelementptr i8, i8* %a, i64 9843086184167632639
   %2 = load i8, i8* %1
@@ -159,10 +209,15 @@ define i64 @load_long_range(i8 *%a) nounwind {
 define i64 @load_sext_zext_anyext_i1(i1 *%a) nounwind {
 ; CHECK-LABEL: load_sext_zext_anyext_i1:
 ; CHECK:       % %bb.0:
+; CHECK-NEXT:    sub $254,$254,0x10
+; CHECK-NEXT:    sto $253,$254,0x8
+; CHECK-NEXT:    add $253,$254,0x10
 ; CHECK-NEXT:    ldb $16,$231,0x0
 ; CHECK-NEXT:    ldbu $16,$231,0x1
 ; CHECK-NEXT:    ldbu $17,$231,0x2
 ; CHECK-NEXT:    sub $231,$17,$16
+; CHECK-NEXT:    ldo $253,$254,0x8
+; CHECK-NEXT:    add $254,$254,0x10
 ; CHECK-NEXT:    pop 0x0,0x0
   ; sextload i1
   %1 = getelementptr i1, i1* %a, i64 1
@@ -181,10 +236,15 @@ define i64 @load_sext_zext_anyext_i1(i1 *%a) nounwind {
 define i16 @load_sext_zext_anyext_i1_i16(i1 *%a) nounwind {
 ; CHECK-LABEL: load_sext_zext_anyext_i1_i16:
 ; CHECK:       % %bb.0:
+; CHECK-NEXT:    sub $254,$254,0x10
+; CHECK-NEXT:    sto $253,$254,0x8
+; CHECK-NEXT:    add $253,$254,0x10
 ; CHECK-NEXT:    ldb $16,$231,0x0
 ; CHECK-NEXT:    ldbu $16,$231,0x1
 ; CHECK-NEXT:    ldbu $17,$231,0x2
 ; CHECK-NEXT:    sub $231,$17,$16
+; CHECK-NEXT:    ldo $253,$254,0x8
+; CHECK-NEXT:    add $254,$254,0x10
 ; CHECK-NEXT:    pop 0x0,0x0
   ; sextload i1
   %1 = getelementptr i1, i1* %a, i64 1
@@ -206,6 +266,9 @@ define i16 @load_sext_zext_anyext_i1_i16(i1 *%a) nounwind {
 define i64 @lw_sw_global(i64 %a) nounwind {
 ; CHECK-LABEL: lw_sw_global:
 ; CHECK:       % %bb.0:
+; CHECK-NEXT:    sub $254,$254,0x10
+; CHECK-NEXT:    sto $253,$254,0x8
+; CHECK-NEXT:    add $253,$254,0x10
 ; CHECK-NEXT:    seth $17,G
 ; CHECK-NEXT:    ormh $17,G
 ; CHECK-NEXT:    orml $17,G
@@ -219,6 +282,8 @@ define i64 @lw_sw_global(i64 %a) nounwind {
 ; CHECK-NEXT:    ldo $18,$17,0x0
 ; CHECK-NEXT:    sto $231,$17,0x0
 ; CHECK-NEXT:    add $231,$16,0x0
+; CHECK-NEXT:    ldo $253,$254,0x8
+; CHECK-NEXT:    add $254,$254,0x10
 ; CHECK-NEXT:    pop 0x0,0x0
   %1 = load volatile i64, i64* @G
   store i64 %a, i64* @G
@@ -234,9 +299,14 @@ define i64 @lw_sw_global(i64 %a) nounwind {
 define i128 @load_i128(i128 *%a) nounwind {
 ; CHECK-LABEL: load_i128:
 ; CHECK:       % %bb.0:
+; CHECK-NEXT:    sub $254,$254,0x10
+; CHECK-NEXT:    sto $253,$254,0x8
+; CHECK-NEXT:    add $253,$254,0x10
 ; CHECK-NEXT:    ldo $16,$231,0x0
 ; CHECK-NEXT:    ldo $232,$231,0x8
 ; CHECK-NEXT:    add $231,$16,0x0
+; CHECK-NEXT:    ldo $253,$254,0x8
+; CHECK-NEXT:    add $254,$254,0x10
 ; CHECK-NEXT:    pop 0x0,0x0
   %1 = load i128, i128* %a
   ret i128 %1
@@ -247,6 +317,9 @@ define i128 @load_i128(i128 *%a) nounwind {
 define i128 @load_i128_global() nounwind {
 ; CHECK-LABEL: load_i128_global:
 ; CHECK:       % %bb.0:
+; CHECK-NEXT:    sub $254,$254,0x10
+; CHECK-NEXT:    sto $253,$254,0x8
+; CHECK-NEXT:    add $253,$254,0x10
 ; CHECK-NEXT:    seth $16,val128
 ; CHECK-NEXT:    ormh $16,val128
 ; CHECK-NEXT:    orml $16,val128
@@ -257,6 +330,8 @@ define i128 @load_i128_global() nounwind {
 ; CHECK-NEXT:    orml $16,val128+8
 ; CHECK-NEXT:    orl $16,val128+8
 ; CHECK-NEXT:    ldo $232,$16,0x0
+; CHECK-NEXT:    ldo $253,$254,0x8
+; CHECK-NEXT:    add $254,$254,0x10
 ; CHECK-NEXT:    pop 0x0,0x0
   %1 = load i128, i128* @val128
   ret i128 %1
