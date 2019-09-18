@@ -34,6 +34,7 @@
 #include "ToolChains/MinGW.h"
 #include "ToolChains/Minix.h"
 #include "ToolChains/MipsLinux.h"
+#include "ToolChains/MMIX.h"
 #include "ToolChains/Myriad.h"
 #include "ToolChains/NaCl.h"
 #include "ToolChains/NetBSD.h"
@@ -4905,6 +4906,9 @@ const ToolChain &Driver::getToolChain(const ArgList &Args,
         break;
       case llvm::Triple::lanai:
         TC = std::make_unique<toolchains::LanaiToolChain>(*this, Target, Args);
+        break;
+      case llvm::Triple::mmix:
+        TC = std::make_unique<toolchains::MMIXToolChain>(*this, Target, Args);
         break;
       case llvm::Triple::xcore:
         TC = std::make_unique<toolchains::XCoreToolChain>(*this, Target, Args);
