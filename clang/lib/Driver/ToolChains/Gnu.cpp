@@ -298,6 +298,8 @@ static const char *getLDMOption(const llvm::Triple &T, const ArgList &Args) {
         T.getEnvironment() == llvm::Triple::GNUABIN32)
       return "elf32ltsmipn32";
     return "elf64ltsmip";
+  case llvm::Triple::mmix:
+    return "elf64mmix";
   case llvm::Triple::systemz:
     return "elf64_s390";
   case llvm::Triple::x86_64:

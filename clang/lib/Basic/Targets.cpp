@@ -24,6 +24,7 @@
 #include "Targets/Le64.h"
 #include "Targets/MSP430.h"
 #include "Targets/Mips.h"
+#include "Targets/MMIX.h"
 #include "Targets/NVPTX.h"
 #include "Targets/OSTargets.h"
 #include "Targets/PNaCl.h"
@@ -122,11 +123,15 @@ TargetInfo *AllocateTarget(const llvm::Triple &Triple,
   case llvm::Triple::lanai:
     return new LanaiTargetInfo(Triple, Opts);
 
+  case llvm::Triple::mmix:
+    return new MMIXTargetInfo(Triple, Opts);
+
   case llvm::Triple::aarch64_32:
     if (Triple.isOSDarwin())
       return new DarwinAArch64TargetInfo(Triple, Opts);
 
     return nullptr;
+
   case llvm::Triple::aarch64:
     if (Triple.isOSDarwin())
       return new DarwinAArch64TargetInfo(Triple, Opts);
