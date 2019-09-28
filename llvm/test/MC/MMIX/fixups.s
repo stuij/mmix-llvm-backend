@@ -273,3 +273,17 @@ check_branch_back:
   pbev $1,check_branch_back
 
 check_branch_forward:
+
+check_geta_back:
+
+# CHECK-INST: geta $1,check_geta_forward
+# CHECK: encoding: [0xf5'A',0x01'A',A,A]
+# CHECK-DISASS: f4 01 00 02     geta $1,0x8
+  geta $1,check_geta_forward
+
+# CHECK-INST: geta $1,check_geta_back
+# CHECK: encoding: [0xf5'A',0x01'A',A,A]
+# CHECK-DISASS: f5 01 ff ff     geta $1,-0x4
+  geta $1,check_geta_back
+
+check_geta_forward:

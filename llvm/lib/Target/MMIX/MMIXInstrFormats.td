@@ -56,6 +56,24 @@ class MMIX1op<bits<8> opcode, dag ins, string opcodestr>
   let Inst{23-0} = xyz;
 }
 
+class MMIXXop<bits<8> opcode, dag ins, string opcodestr>
+    : MMIXInst<(outs), ins, opcodestr, "$x", []> {
+  bits<8> x;
+
+  let Opcode = opcode;
+  let Inst{23-16} = x;
+  let Inst{15-0} = 0;
+}
+
+class MMIXZop<bits<8> opcode, dag ins, string opcodestr>
+    : MMIXInst<(outs), ins, opcodestr, "$z", []> {
+  bits<8> z;
+
+  let Opcode = opcode;
+  let Inst{23-8} = 0;
+  let Inst{7-0} = z;
+}
+
 // 2 operands
 class MMIX2op<bits<8> opcode, dag outs, dag ins, string opcodestr>
     : MMIXInst<outs, ins, opcodestr, "$x,$yz", []> {
