@@ -34,3 +34,9 @@
  seth $1,0x10000
 # CHECK: :10: error: operand must be either a label or an integer in the range [0, 0xffff]
  seth $1,-0x1
+
+# CHECK: error: operand must be an integer in the range [0, 4]
+fix $4,0x5,$6
+
+# CHECK: error: operand must be an integer in the range [0, 4]
+fsqrt $4,-0x1,$6

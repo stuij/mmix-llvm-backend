@@ -80,6 +80,7 @@ void MMIXInstPrinter::printBranchImm(const MCInst *MI, unsigned OpNum,
     case MMIX::PBNZ_B:
     case MMIX::PBNP_B:
     case MMIX::PBEV_B:
+    case MMIX::GETA_B:
       back = true;
       break;
     default:

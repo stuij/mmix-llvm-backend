@@ -156,6 +156,13 @@ public:
     return true;
   }
 
+  bool isFloatRoundMode() const {
+    if(!isConstantImm())
+      return false;
+    int64_t imm = getConstantImm();
+    return imm >= 0 && imm <= 4;
+  }
+
   bool isUImm8() const {
     return (isConstantImm() && isUInt<8>(getConstantImm()));
   }
@@ -319,6 +326,11 @@ bool MMIXAsmParser::MatchAndEmitInstruction(SMLoc IDLoc, unsigned &Opcode,
     ErrorLoc = ((MMIXOperand &)*Operands[ErrorInfo]).getStartLoc();
     return Error(ErrorLoc,
                  "immediate must be an integer in the range [0, 0xffff]");
+  case Match_InvalidFloatRoundMode:
+    ErrorLoc = ((MMIXOperand &)*Operands[ErrorInfo]).getStartLoc();
+    return Error(ErrorLoc,
+                 "operand must be an integer in the range [0, 4] "
+                 "representing one of the Float rounding mode options");
   case Match_InvalidWyde:
     ErrorLoc = ((MMIXOperand &)*Operands[ErrorInfo]).getStartLoc();
     return Error(ErrorLoc,
