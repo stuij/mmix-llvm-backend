@@ -1,0 +1,3 @@
+[submodule "mmix-llvm-support"]
+	path = mmix-llvm-support
+	url = https://github.com/stuij/mmix-llvm-support
