@@ -74,6 +74,8 @@ TargetInfo *getTarget() {
     default:
       llvm_unreachable("unsupported MIPS target");
     }
+  case EM_MMIX:
+    return getMMIXTargetInfo();
   case EM_MSP430:
     return getMSP430TargetInfo();
   case EM_PPC:
