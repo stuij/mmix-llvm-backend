@@ -1,0 +1,29 @@
+name: check-mmix-patches
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: install things and set up
+      run: |
+        git config --global user.email "ties@stuij.se"
+        git config --global user.name "Ties Stuij"
+        sudo pip install ninja psutil
+        git clone https://github.com/stuij/mmix-llvm-support.git support
+        wget https://github.com/stuij/binutils-gdb/releases/download/binutils-2.16.91-20051206/mmix-objcopy -O support/bin/mmix-objcopy
+        chmod +x support/bin/mmix-objcopy
+        wget https://github.com/ascherer/mmix/releases/download/2017-09-17/mmix_20170917-2_amd64.deb
+        sudo apt install ./mmix_20170917-2_amd64.deb
+
+    - name: set and fetch upstream
+      run: |
+        git remote add upstream https://github.com/llvm/llvm-project
+        git fetch upstream
+
+    - name: apply patches and build
+      run: support/bin/check-patches.sh -s . -t tmp -c -l 1
